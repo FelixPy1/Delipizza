@@ -205,7 +205,15 @@ def void_sale(id):
     return jsonify({"ok":True})
 
 # ── INIT ──────────────────────────────────────────
+with app.app_context():
+    db.create_all()
+    # Semilla de datos si está vacío
+    if not Product.query.first():
+        p1 = Product(name="Pizza Pepperoni", price=500, category="Pizza", emoji="🍕")
+        p2 = Product(name="Papas Fritas", price=150, category="Papas", emoji="🍟")
+        p3 = Product(name="Refresco 16oz", price=75, category="Bebidas", emoji="🥤")
+        db.session.add_all([p1, p2, p3])
+        db.session.commit()
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT",5000)))
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
