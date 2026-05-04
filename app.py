@@ -25,16 +25,24 @@ app = Flask(
 
 app.config['SECRET_KEY'] = 'dp-ma-secret'
 
-# ── BASE DE DATOS (AHORA SQLITE PARA RENDER) ──────
-db_path = os.path.join(os.path.abspath("."), "delipizza.db")
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
+# ── BASE DE DATOS ──────────────────────────────────
+# En Render, usar DATABASE_URL (PostgreSQL), sino SQLite local
+db_url = os.getenv('DATABASE_URL')
+if db_url and db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+if not db_url:
+    db_path = os.path.join(os.path.abspath("."), "delipizza.db")
+    db_url = f"sqlite:///{db_path}"
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# ── LOGIN ─────────────────────────────────────────
-ADMIN_USER = os.getenv('ADMIN_USER', 'admin')
-ADMIN_PASS = os.getenv('ADMIN_PASS', '1234')
+# ── CONFIG ─────────────────────────────────────────
+ADMIN_USER = os.getenv('ADMIN_USER', 'alexander2026MA')
+ADMIN_PASS = os.getenv('ADMIN_PASS', '12345MMAA')
 
 def login_required(f):
     @functools.wraps(f)
