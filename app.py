@@ -30,16 +30,20 @@ else:
 app.config['SECRET_KEY'] = 'dp-ma-secret'
 
 # ── BASE DE DATOS ──────────────────────────────────
-# En Render, usar DATABASE_URL (PostgreSQL), sino SQLite local
+# Prioridad: 1. PostgreSQL (Supabase/Render) | 2. SQLite (Local/Emergencia)
 db_url = os.getenv('DATABASE_URL')
-if db_url and db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-if not db_url:
+if db_url:
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+else:
+    # Fallback automático para que la app NUNCA se apague por error de configuración
     db_path = os.path.join(os.path.abspath("."), "delipizza.db")
     db_url = f"sqlite:///{db_path}"
+    print("⚠️ ADVERTENCIA: DATABASE_URL no encontrada. Usando SQLite temporalmente.")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
