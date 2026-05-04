@@ -221,12 +221,25 @@ def void_sale(id):
 
 # ── INIT ──────────────────────────────────────────
 with app.app_context():
-    db.create_all()
+    # Intento de migración automática simple para SQLite/Render
+    try:
+        # Verificar si la columna cost_price existe en Product
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        columns = [c['name'] for c in inspector.get_columns('product')]
+        if 'cost_price' not in columns:
+            print("Esquema antiguo detectado. Recreando base de datos...")
+            db.drop_all()
+            db.create_all()
+    except Exception as e:
+        print(f"Error al verificar esquema: {e}")
+        db.create_all()
+
     # Semilla de datos si está vacío
     if not Product.query.first():
-        p1 = Product(name="Pizza Pepperoni", price=500, category="Pizza", emoji="🍕")
-        p2 = Product(name="Papas Fritas", price=150, category="Papas", emoji="🍟")
-        p3 = Product(name="Refresco 16oz", price=75, category="Bebidas", emoji="🥤")
+        p1 = Product(name="Pizza Pepperoni", price=500, cost_price=350, category="Pizza", emoji="🍕")
+        p2 = Product(name="Papas Fritas", price=150, cost_price=80, category="Papas", emoji="🍟")
+        p3 = Product(name="Refresco 16oz", price=75, cost_price=40, category="Bebidas", emoji="🥤")
         db.session.add_all([p1, p2, p3])
         db.session.commit()
 
