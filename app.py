@@ -177,6 +177,8 @@ def add_sale():
         "product_emoji": prod.emoji,
         "quantity": s.quantity,
         "price_at_sale": s.price_at_sale,
+        "cost_at_sale": s.cost_at_sale,
+        "profit_at_sale": s.price_at_sale - s.cost_at_sale,
         "date": s.date.isoformat(),
         "unit_price": prod.price
     })
@@ -212,6 +214,8 @@ def sales_history():
             "date": s.date.isoformat(),
             "quantity": s.quantity,
             "price_at_sale": s.price_at_sale,
+            "cost_at_sale": s.cost_at_sale,
+            "profit_at_sale": s.price_at_sale - (s.cost_at_sale or 0),
             "invoice_number": f"FAC-{str(s.id).zfill(4)}"
         })
     return jsonify(results)

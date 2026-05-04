@@ -214,6 +214,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('inv-unit-price').textContent = `$${unitPrice.toFixed(2)}`;
     document.getElementById('inv-item-total').textContent = `$${sale.price_at_sale.toFixed(2)}`;
     document.getElementById('inv-grand-total').textContent = `$${sale.price_at_sale.toFixed(2)}`;
+    
+    // Datos Internos
+    document.getElementById('inv-internal-cost').textContent = `$${(sale.cost_at_sale || 0).toFixed(2)}`;
+    document.getElementById('inv-internal-profit').textContent = `$${(sale.profit_at_sale || 0).toFixed(2)}`;
+    
     document.getElementById('invoice-modal').classList.add('active');
   }
 
