@@ -634,10 +634,6 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\__init__.py',
    'PYMODULE'),
-  ('ctypes.wintypes',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\wintypes.py',
-   'PYMODULE'),
   ('ctypes._endian',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\_endian.py',
@@ -1546,6 +1542,10 @@
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\setuptools\\windows_support.py',
    'PYMODULE'),
+  ('ctypes.wintypes',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\ctypes\\wintypes.py',
+   'PYMODULE'),
   ('setuptools.command',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\setuptools\\command\\__init__.py',
@@ -2185,6 +2185,142 @@
   ('bottle',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\bottle.py',
+   'PYMODULE'),
+  ('gunicorn.app.base',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\app\\base.py',
+   'PYMODULE'),
+  ('gunicorn.app',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\app\\__init__.py',
+   'PYMODULE'),
+  ('gunicorn.debug',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\debug.py',
+   'PYMODULE'),
+  ('gunicorn.config',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\config.py',
+   'PYMODULE'),
+  ('gunicorn.reloader',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\reloader.py',
+   'PYMODULE'),
+  ('gunicorn.errors',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\errors.py',
+   'PYMODULE'),
+  ('gunicorn.arbiter',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\arbiter.py',
+   'PYMODULE'),
+  ('gunicorn.ctl.server',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\ctl\\server.py',
+   'PYMODULE'),
+  ('gunicorn.ctl',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\ctl\\__init__.py',
+   'PYMODULE'),
+  ('gunicorn.ctl.client',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\ctl\\client.py',
+   'PYMODULE'),
+  ('gunicorn.ctl.protocol',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\ctl\\protocol.py',
+   'PYMODULE'),
+  ('gunicorn.ctl.handlers',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\ctl\\handlers.py',
+   'PYMODULE'),
+  ('gunicorn.dirty.protocol',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\dirty\\protocol.py',
+   'PYMODULE'),
+  ('gunicorn.dirty.tlv',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\dirty\\tlv.py',
+   'PYMODULE'),
+  ('gunicorn.dirty.errors',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\dirty\\errors.py',
+   'PYMODULE'),
+  ('gunicorn.dirty',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\dirty\\__init__.py',
+   'PYMODULE'),
+  ('gunicorn.dirty.arbiter',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\dirty\\arbiter.py',
+   'PYMODULE'),
+  ('gunicorn.dirty.worker',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\dirty\\worker.py',
+   'PYMODULE'),
+  ('gunicorn.workers.workertmp',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\workers\\workertmp.py',
+   'PYMODULE'),
+  ('gunicorn.workers',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\workers\\__init__.py',
+   'PYMODULE'),
+  ('gunicorn.dirty.stash',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\dirty\\stash.py',
+   'PYMODULE'),
+  ('gunicorn.dirty.client',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\dirty\\client.py',
+   'PYMODULE'),
+  ('gunicorn.dirty.app',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\dirty\\app.py',
+   'PYMODULE'),
+  ('gunicorn.systemd',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\systemd.py',
+   'PYMODULE'),
+  ('gunicorn.sock',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\sock.py',
+   'PYMODULE'),
+  ('gunicorn.http2',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\http2\\__init__.py',
+   'PYMODULE'),
+  ('gunicorn.http2.async_connection',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\http2\\async_connection.py',
+   'PYMODULE'),
+  ('gunicorn.http2.request',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\http2\\request.py',
+   'PYMODULE'),
+  ('gunicorn.http2.stream',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\http2\\stream.py',
+   'PYMODULE'),
+  ('gunicorn.http2.connection',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\http2\\connection.py',
+   'PYMODULE'),
+  ('gunicorn.http2.errors',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\http2\\errors.py',
+   'PYMODULE'),
+  ('gunicorn.pidfile',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\pidfile.py',
+   'PYMODULE'),
+  ('gunicorn.util',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\util.py',
+   'PYMODULE'),
+  ('gunicorn',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\gunicorn\\__init__.py',
    'PYMODULE'),
   ('wsgiref.handlers',
    'C:\\Program '
@@ -3383,13 +3519,13 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\tracemalloc.py',
    'PYMODULE'),
-  ('_py_abc',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\_py_abc.py',
-   'PYMODULE'),
   ('stringprep',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\stringprep.py',
+   'PYMODULE'),
+  ('_py_abc',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\_py_abc.py',
    'PYMODULE'),
   ('app',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza M&A\\app.py',
@@ -3414,29 +3550,29 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\_threading_local.py',
    'PYMODULE')],
- [('webview\\lib\\Microsoft.Web.WebView2.WinForms.dll',
+ [('webview\\lib\\runtimes\\win-arm64\\native\\WebView2Loader.dll',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\webview\\lib\\Microsoft.Web.WebView2.WinForms.dll',
-   'BINARY'),
-  ('webview\\lib\\WebBrowserInterop.x64.dll',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\webview\\lib\\WebBrowserInterop.x64.dll',
-   'BINARY'),
-  ('webview\\lib\\runtimes\\win-x64\\native\\WebView2Loader.dll',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\webview\\lib\\runtimes\\win-x64\\native\\WebView2Loader.dll',
-   'BINARY'),
-  ('webview\\lib\\runtimes\\win-x86\\native\\WebView2Loader.dll',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\webview\\lib\\runtimes\\win-x86\\native\\WebView2Loader.dll',
+   'M&A\\venv\\Lib\\site-packages\\webview\\lib\\runtimes\\win-arm64\\native\\WebView2Loader.dll',
    'BINARY'),
   ('webview\\lib\\Microsoft.Web.WebView2.Core.dll',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\webview\\lib\\Microsoft.Web.WebView2.Core.dll',
    'BINARY'),
-  ('webview\\lib\\runtimes\\win-arm64\\native\\WebView2Loader.dll',
+  ('webview\\lib\\runtimes\\win-x64\\native\\WebView2Loader.dll',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\webview\\lib\\runtimes\\win-arm64\\native\\WebView2Loader.dll',
+   'M&A\\venv\\Lib\\site-packages\\webview\\lib\\runtimes\\win-x64\\native\\WebView2Loader.dll',
+   'BINARY'),
+  ('webview\\lib\\WebBrowserInterop.x64.dll',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\webview\\lib\\WebBrowserInterop.x64.dll',
+   'BINARY'),
+  ('webview\\lib\\runtimes\\win-x86\\native\\WebView2Loader.dll',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\webview\\lib\\runtimes\\win-x86\\native\\WebView2Loader.dll',
+   'BINARY'),
+  ('webview\\lib\\Microsoft.Web.WebView2.WinForms.dll',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\webview\\lib\\Microsoft.Web.WebView2.WinForms.dll',
    'BINARY'),
   ('webview\\lib\\WebBrowserInterop.x86.dll',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
@@ -3450,13 +3586,13 @@
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\pythonnet\\runtime\\Python.Runtime.dll',
    'BINARY'),
-  ('clr_loader\\ffi\\dlls\\x86\\ClrLoader.dll',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\clr_loader\\ffi\\dlls\\x86\\ClrLoader.dll',
-   'BINARY'),
   ('clr_loader\\ffi\\dlls\\amd64\\ClrLoader.dll',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\clr_loader\\ffi\\dlls\\amd64\\ClrLoader.dll',
+   'BINARY'),
+  ('clr_loader\\ffi\\dlls\\x86\\ClrLoader.dll',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\clr_loader\\ffi\\dlls\\x86\\ClrLoader.dll',
    'BINARY'),
   ('_decimal.pyd',
    'C:\\Program '
@@ -3617,34 +3753,46 @@
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\WHEEL',
    'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\licenses\\LICENSE',
+  ('setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\RECORD',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\licenses\\LICENSE',
-   'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\METADATA',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\METADATA',
+   'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\RECORD',
    'DATA'),
   ('setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\top_level.txt',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\top_level.txt',
    'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\INSTALLER',
+  ('setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\METADATA',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\INSTALLER',
+   'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\METADATA',
    'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\RECORD',
+  ('setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\licenses\\LICENSE',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\RECORD',
+   'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\licenses\\LICENSE',
    'DATA'),
   ('setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\REQUESTED',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\REQUESTED',
    'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\INSTALLER',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.7.1.dist-info\\INSTALLER',
+   'DATA'),
   ('setuptools\\_vendor\\jaraco\\text\\Lorem ipsum.txt',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\setuptools\\_vendor\\jaraco\\text\\Lorem '
    'ipsum.txt',
+   'DATA'),
+  ('webview\\js\\state.js',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\webview\\js\\state.js',
+   'DATA'),
+  ('webview\\js\\api.js',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\webview\\js\\api.js',
+   'DATA'),
+  ('webview\\js\\customize.js',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\webview\\js\\customize.js',
    'DATA'),
   ('webview\\js\\finish.js',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
@@ -3654,185 +3802,193 @@
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\webview\\lib\\pywebview-android.jar',
    'DATA'),
-  ('webview\\js\\lib\\polyfill.js',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\webview\\js\\lib\\polyfill.js',
-   'DATA'),
-  ('webview\\js\\state.js',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\webview\\js\\state.js',
-   'DATA'),
   ('webview\\js\\lib\\dom_json.js',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\webview\\js\\lib\\dom_json.js',
    'DATA'),
-  ('webview\\js\\customize.js',
+  ('webview\\js\\lib\\polyfill.js',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\webview\\js\\customize.js',
-   'DATA'),
-  ('webview\\js\\api.js',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\webview\\js\\api.js',
-   'DATA'),
-  ('markupsafe-3.0.3.dist-info\\top_level.txt',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\top_level.txt',
-   'DATA'),
-  ('markupsafe-3.0.3.dist-info\\WHEEL',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\WHEEL',
-   'DATA'),
-  ('werkzeug-3.1.8.dist-info\\WHEEL',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\werkzeug-3.1.8.dist-info\\WHEEL',
-   'DATA'),
-  ('itsdangerous-2.2.0.dist-info\\RECORD',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\RECORD',
-   'DATA'),
-  ('click-8.3.3.dist-info\\licenses\\LICENSE.txt',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\click-8.3.3.dist-info\\licenses\\LICENSE.txt',
-   'DATA'),
-  ('flask_sqlalchemy-3.1.1.dist-info\\INSTALLER',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\INSTALLER',
-   'DATA'),
-  ('click-8.3.3.dist-info\\RECORD',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\click-8.3.3.dist-info\\RECORD',
-   'DATA'),
-  ('werkzeug-3.1.8.dist-info\\RECORD',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\werkzeug-3.1.8.dist-info\\RECORD',
-   'DATA'),
-  ('itsdangerous-2.2.0.dist-info\\WHEEL',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\WHEEL',
-   'DATA'),
-  ('markupsafe-3.0.3.dist-info\\RECORD',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\RECORD',
-   'DATA'),
-  ('flask_sqlalchemy-3.1.1.dist-info\\METADATA',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\METADATA',
-   'DATA'),
-  ('flask_sqlalchemy-3.1.1.dist-info\\WHEEL',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\WHEEL',
-   'DATA'),
-  ('itsdangerous-2.2.0.dist-info\\LICENSE.txt',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\LICENSE.txt',
-   'DATA'),
-  ('werkzeug-3.1.8.dist-info\\licenses\\LICENSE.txt',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\werkzeug-3.1.8.dist-info\\licenses\\LICENSE.txt',
-   'DATA'),
-  ('flask-3.1.3.dist-info\\INSTALLER',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\INSTALLER',
-   'DATA'),
-  ('markupsafe-3.0.3.dist-info\\INSTALLER',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\INSTALLER',
-   'DATA'),
-  ('flask-3.1.3.dist-info\\licenses\\LICENSE.txt',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\licenses\\LICENSE.txt',
-   'DATA'),
-  ('markupsafe-3.0.3.dist-info\\METADATA',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\METADATA',
-   'DATA'),
-  ('markupsafe-3.0.3.dist-info\\licenses\\LICENSE.txt',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\licenses\\LICENSE.txt',
-   'DATA'),
-  ('flask-3.1.3.dist-info\\REQUESTED',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\REQUESTED',
-   'DATA'),
-  ('click-8.3.3.dist-info\\METADATA',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\click-8.3.3.dist-info\\METADATA',
-   'DATA'),
-  ('itsdangerous-2.2.0.dist-info\\INSTALLER',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\INSTALLER',
-   'DATA'),
-  ('flask-3.1.3.dist-info\\WHEEL',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\WHEEL',
-   'DATA'),
-  ('itsdangerous-2.2.0.dist-info\\METADATA',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\METADATA',
+   'M&A\\venv\\Lib\\site-packages\\webview\\js\\lib\\polyfill.js',
    'DATA'),
   ('flask-3.1.3.dist-info\\METADATA',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\METADATA',
    'DATA'),
-  ('werkzeug-3.1.8.dist-info\\METADATA',
+  ('flask-3.1.3.dist-info\\entry_points.txt',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\werkzeug-3.1.8.dist-info\\METADATA',
+   'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\entry_points.txt',
    'DATA'),
-  ('click-8.3.3.dist-info\\INSTALLER',
+  ('markupsafe-3.0.3.dist-info\\licenses\\LICENSE.txt',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\click-8.3.3.dist-info\\INSTALLER',
-   'DATA'),
-  ('flask_sqlalchemy-3.1.1.dist-info\\RECORD',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\RECORD',
-   'DATA'),
-  ('werkzeug-3.1.8.dist-info\\INSTALLER',
-   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\werkzeug-3.1.8.dist-info\\INSTALLER',
+   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\licenses\\LICENSE.txt',
    'DATA'),
   ('flask-3.1.3.dist-info\\RECORD',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\RECORD',
    'DATA'),
-  ('click-8.3.3.dist-info\\WHEEL',
+  ('flask_sqlalchemy-3.1.1.dist-info\\METADATA',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\click-8.3.3.dist-info\\WHEEL',
+   'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\METADATA',
    'DATA'),
-  ('flask_sqlalchemy-3.1.1.dist-info\\LICENSE.rst',
+  ('click-8.3.3.dist-info\\METADATA',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\LICENSE.rst',
+   'M&A\\venv\\Lib\\site-packages\\click-8.3.3.dist-info\\METADATA',
+   'DATA'),
+  ('flask_sqlalchemy-3.1.1.dist-info\\RECORD',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\RECORD',
+   'DATA'),
+  ('markupsafe-3.0.3.dist-info\\RECORD',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\RECORD',
+   'DATA'),
+  ('itsdangerous-2.2.0.dist-info\\RECORD',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\RECORD',
+   'DATA'),
+  ('itsdangerous-2.2.0.dist-info\\WHEEL',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\WHEEL',
+   'DATA'),
+  ('flask_sqlalchemy-3.1.1.dist-info\\INSTALLER',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\INSTALLER',
+   'DATA'),
+  ('click-8.3.3.dist-info\\licenses\\LICENSE.txt',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\click-8.3.3.dist-info\\licenses\\LICENSE.txt',
+   'DATA'),
+  ('markupsafe-3.0.3.dist-info\\INSTALLER',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\INSTALLER',
+   'DATA'),
+  ('markupsafe-3.0.3.dist-info\\METADATA',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\METADATA',
+   'DATA'),
+  ('flask-3.1.3.dist-info\\REQUESTED',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\REQUESTED',
+   'DATA'),
+  ('flask-3.1.3.dist-info\\licenses\\LICENSE.txt',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\licenses\\LICENSE.txt',
+   'DATA'),
+  ('click-8.3.3.dist-info\\INSTALLER',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\click-8.3.3.dist-info\\INSTALLER',
+   'DATA'),
+  ('werkzeug-3.1.8.dist-info\\METADATA',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\werkzeug-3.1.8.dist-info\\METADATA',
    'DATA'),
   ('flask_sqlalchemy-3.1.1.dist-info\\REQUESTED',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\REQUESTED',
    'DATA'),
-  ('flask-3.1.3.dist-info\\entry_points.txt',
+  ('flask_sqlalchemy-3.1.1.dist-info\\LICENSE.rst',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
-   'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\entry_points.txt',
+   'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\LICENSE.rst',
+   'DATA'),
+  ('flask_sqlalchemy-3.1.1.dist-info\\WHEEL',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\flask_sqlalchemy-3.1.1.dist-info\\WHEEL',
+   'DATA'),
+  ('flask-3.1.3.dist-info\\INSTALLER',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\INSTALLER',
+   'DATA'),
+  ('werkzeug-3.1.8.dist-info\\INSTALLER',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\werkzeug-3.1.8.dist-info\\INSTALLER',
+   'DATA'),
+  ('werkzeug-3.1.8.dist-info\\RECORD',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\werkzeug-3.1.8.dist-info\\RECORD',
+   'DATA'),
+  ('click-8.3.3.dist-info\\WHEEL',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\click-8.3.3.dist-info\\WHEEL',
+   'DATA'),
+  ('itsdangerous-2.2.0.dist-info\\METADATA',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\METADATA',
+   'DATA'),
+  ('werkzeug-3.1.8.dist-info\\licenses\\LICENSE.txt',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\werkzeug-3.1.8.dist-info\\licenses\\LICENSE.txt',
+   'DATA'),
+  ('flask-3.1.3.dist-info\\WHEEL',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\flask-3.1.3.dist-info\\WHEEL',
+   'DATA'),
+  ('click-8.3.3.dist-info\\RECORD',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\click-8.3.3.dist-info\\RECORD',
+   'DATA'),
+  ('werkzeug-3.1.8.dist-info\\WHEEL',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\werkzeug-3.1.8.dist-info\\WHEEL',
+   'DATA'),
+  ('markupsafe-3.0.3.dist-info\\top_level.txt',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\top_level.txt',
+   'DATA'),
+  ('itsdangerous-2.2.0.dist-info\\LICENSE.txt',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\LICENSE.txt',
+   'DATA'),
+  ('itsdangerous-2.2.0.dist-info\\INSTALLER',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('markupsafe-3.0.3.dist-info\\WHEEL',
+   'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
+   'M&A\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\WHEEL',
    'DATA'),
   ('base_library.zip',
    'C:\\Users\\felix\\OneDrive\\Desktop\\Deli-Pizza '
    'M&A\\build\\delipizza\\base_library.zip',
    'DATA')],
- [('reprlib',
+ [('re._parser',
    'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\reprlib.py',
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\re\\_parser.py',
    'PYMODULE'),
-  ('locale',
+  ('re._constants',
    'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\locale.py',
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\re\\_constants.py',
+   'PYMODULE'),
+  ('re._compiler',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\re\\_compiler.py',
+   'PYMODULE'),
+  ('re._casefix',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\re\\_casefix.py',
+   'PYMODULE'),
+  ('re',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\re\\__init__.py',
+   'PYMODULE'),
+  ('stat',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\stat.py',
+   'PYMODULE'),
+  ('ntpath',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\ntpath.py',
+   'PYMODULE'),
+  ('sre_compile',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\sre_compile.py',
    'PYMODULE'),
   ('warnings',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\warnings.py',
    'PYMODULE'),
-  ('_weakrefset',
+  ('copyreg',
    'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\_weakrefset.py',
-   'PYMODULE'),
-  ('abc',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\abc.py',
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\copyreg.py',
    'PYMODULE'),
   ('weakref',
    'C:\\Program '
@@ -3842,9 +3998,53 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\heapq.py',
    'PYMODULE'),
+  ('sre_constants',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\sre_constants.py',
+   'PYMODULE'),
+  ('linecache',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\linecache.py',
+   'PYMODULE'),
+  ('enum',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\enum.py',
+   'PYMODULE'),
+  ('genericpath',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\genericpath.py',
+   'PYMODULE'),
+  ('reprlib',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\reprlib.py',
+   'PYMODULE'),
+  ('operator',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\operator.py',
+   'PYMODULE'),
+  ('posixpath',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\posixpath.py',
+   'PYMODULE'),
+  ('types',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\types.py',
+   'PYMODULE'),
   ('sre_parse',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\sre_parse.py',
+   'PYMODULE'),
+  ('io',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\io.py',
+   'PYMODULE'),
+  ('keyword',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\keyword.py',
+   'PYMODULE'),
+  ('_collections_abc',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\_collections_abc.py',
    'PYMODULE'),
   ('collections.abc',
    'C:\\Program '
@@ -3854,33 +4054,21 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\collections\\__init__.py',
    'PYMODULE'),
-  ('genericpath',
+  ('codecs',
    'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\genericpath.py',
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\codecs.py',
    'PYMODULE'),
-  ('traceback',
+  ('locale',
    'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\traceback.py',
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\locale.py',
    'PYMODULE'),
-  ('_collections_abc',
+  ('functools',
    'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\_collections_abc.py',
-   'PYMODULE'),
-  ('operator',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\operator.py',
-   'PYMODULE'),
-  ('copyreg',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\copyreg.py',
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\functools.py',
    'PYMODULE'),
   ('os',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\os.py',
-   'PYMODULE'),
-  ('enum',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\enum.py',
    'PYMODULE'),
   ('encodings.zlib_codec',
    'C:\\Program '
@@ -4370,67 +4558,15 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\encodings\\__init__.py',
    'PYMODULE'),
-  ('stat',
+  ('_weakrefset',
    'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\stat.py',
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\_weakrefset.py',
    'PYMODULE'),
-  ('keyword',
+  ('abc',
    'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\keyword.py',
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\abc.py',
    'PYMODULE'),
-  ('ntpath',
+  ('traceback',
    'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\ntpath.py',
-   'PYMODULE'),
-  ('sre_constants',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\sre_constants.py',
-   'PYMODULE'),
-  ('types',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\types.py',
-   'PYMODULE'),
-  ('re._parser',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\re\\_parser.py',
-   'PYMODULE'),
-  ('re._constants',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\re\\_constants.py',
-   'PYMODULE'),
-  ('re._compiler',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\re\\_compiler.py',
-   'PYMODULE'),
-  ('re._casefix',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\re\\_casefix.py',
-   'PYMODULE'),
-  ('re',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\re\\__init__.py',
-   'PYMODULE'),
-  ('io',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\io.py',
-   'PYMODULE'),
-  ('functools',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\functools.py',
-   'PYMODULE'),
-  ('codecs',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\codecs.py',
-   'PYMODULE'),
-  ('linecache',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\linecache.py',
-   'PYMODULE'),
-  ('posixpath',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\posixpath.py',
-   'PYMODULE'),
-  ('sre_compile',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\sre_compile.py',
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib\\traceback.py',
    'PYMODULE')])
