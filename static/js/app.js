@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res.ok) {
         closeModal();
         showToast(editId ? 'Producto actualizado' : 'Producto agregado');
-        loadPOS();
+        loadProducts();
         loadProductsManagement();
       }
     } catch { showToast('Error al guardar', 'error'); }
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!deleteProductId) return;
     try {
       const res = await fetch(`/api/products/${deleteProductId}`, {method:'DELETE'});
-      if (res.ok) { showToast('Producto eliminado'); closeDeleteModal(); loadProductsManagement(); loadPOS(); }
+      if (res.ok) { showToast('Producto eliminado'); closeDeleteModal(); loadProductsManagement(); loadProducts(); }
     } catch { showToast('Error al eliminar','error'); }
   });
 
@@ -566,7 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ---- INIT ----
-  loadPOS();
+  loadProducts();
   loadReports();
   loadHistorial('today');
 });
