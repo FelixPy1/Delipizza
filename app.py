@@ -17,11 +17,15 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 # ── APP ───────────────────────────────────────────
-app = Flask(
-    __name__,
-    template_folder=resource_path("templates"),
-    static_folder=resource_path("static")
-)
+# En Render no usamos resource_path para evitar problemas con gunicorn
+if os.environ.get("RENDER"):
+    app = Flask(__name__)
+else:
+    app = Flask(
+        __name__,
+        template_folder=resource_path("templates"),
+        static_folder=resource_path("static")
+    )
 
 app.config['SECRET_KEY'] = 'dp-ma-secret'
 
@@ -223,7 +227,7 @@ def void_sale(id):
 with app.app_context():
     # Intento de migración automática simple para SQLite/Render
     try:
-        # Verificar si la columna cost_price existe en Product
+        db.create_all() # Asegurar que las tablas existen primero
         from sqlalchemy import inspect
         inspector = inspect(db.engine)
         columns = [c['name'] for c in inspector.get_columns('product')]
@@ -235,13 +239,17 @@ with app.app_context():
         print(f"Error al verificar esquema: {e}")
         db.create_all()
 
-    # Semilla de datos si está vacío
-    if not Product.query.first():
-        p1 = Product(name="Pizza Pepperoni", price=500, cost_price=350, category="Pizza", emoji="🍕")
-        p2 = Product(name="Papas Fritas", price=150, cost_price=80, category="Papas", emoji="🍟")
-        p3 = Product(name="Refresco 16oz", price=75, cost_price=40, category="Bebidas", emoji="🥤")
-        db.session.add_all([p1, p2, p3])
-        db.session.commit()
+    # Semilla de datos si está vacío o si falla el count
+    try:
+        if Product.query.count() == 0:
+            print("Sembrando datos iniciales...")
+            p1 = Product(name="Pizza Pepperoni", price=500, cost_price=350, category="Pizza", emoji="🍕")
+            p2 = Product(name="Papas Fritas", price=150, cost_price=80, category="Papas", emoji="🍟")
+            p3 = Product(name="Refresco 16oz", price=75, cost_price=40, category="Bebidas", emoji="🥤")
+            db.session.add_all([p1, p2, p3])
+            db.session.commit()
+    except:
+        db.session.rollback()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
