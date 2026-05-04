@@ -425,7 +425,18 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="mgmt-details">
             <div class="mgmt-name">${p.name}</div>
             <div class="mgmt-category">${p.category||'General'}</div>
-            <div class="mgmt-price">$${p.price.toFixed(2)}</div>
+            <div class="mgmt-prices">
+              <div class="mgmt-price-item">
+                <span class="price-dot sale"></span>
+                <span class="price-lab">Venta:</span>
+                <span class="price-val">$${p.price.toFixed(2)}</span>
+              </div>
+              <div class="mgmt-price-item">
+                <span class="price-dot cost"></span>
+                <span class="price-lab">Costo:</span>
+                <span class="price-val">$${(p.cost_price||0).toFixed(2)}</span>
+              </div>
+            </div>
           </div>
           <div class="mgmt-actions">
             <button class="btn-icon btn-edit" title="Editar">
