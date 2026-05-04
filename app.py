@@ -30,21 +30,26 @@ else:
 app.config['SECRET_KEY'] = 'dp-ma-secret'
 
 # ── BASE DE DATOS ──────────────────────────────────
-# Prioridad: 1. PostgreSQL (Supabase/Render) | 2. SQLite (Local/Emergencia)
-db_url = os.getenv('DATABASE_URL')
+db_url = os.environ.get('DATABASE_URL')
 
 if db_url:
+    # Limpiar espacios y corregir prefijo
+    db_url = db_url.strip()
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
+    print(f"🔗 Intentando conectar a: {db_url.split('@')[-1]}") # Solo mostramos el host por seguridad
 else:
-    # Fallback automático para que la app NUNCA se apague por error de configuración
     db_path = os.path.join(os.path.abspath("."), "delipizza.db")
     db_url = f"sqlite:///{db_path}"
-    print("⚠️ ADVERTENCIA: DATABASE_URL no encontrada. Usando SQLite temporalmente.")
+    print("🏠 Usando base de datos local (SQLite)")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Forzar a SQLAlchemy a usar un pool de conexiones más estable
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
 
 db = SQLAlchemy(app)
 
