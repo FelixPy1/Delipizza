@@ -541,9 +541,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);displ
     .product-name { font-size: 0.8rem !important; }
     .product-emoji { font-size: 2.2rem !important; }
     
-    /* Form Rows Stacking */
-    .form-row { flex-direction: column !important; gap: 0 !important; }
-    .form-group { width: 100% !important; margin-bottom: 16px !important; }
+    /* Form Rows Stacking - MUCH MORE AGGRESSIVE */
+    .form-row { 
+        display: block !important; 
+        margin-bottom: 0 !important; 
+    }
+    .form-group { 
+        width: 100% !important; 
+        flex: none !important; 
+        margin-bottom: 20px !important; 
+    }
+    .input-prefix-wrapper { width: 100% !important; }
 
     /* Product Mgmt Card Responsive */
     .product-mgmt-card {
