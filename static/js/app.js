@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('edit-product-id').value = product.id;
       document.getElementById('product-name').value = product.name;
       document.getElementById('product-price').value = product.price;
+      document.getElementById('product-cost').value = product.cost_price || '';
       document.getElementById('product-category').value = product.category || 'General';
       selectedEmoji = product.emoji || '🍕';
       document.getElementById('product-emoji').value = selectedEmoji;
@@ -126,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const editId = document.getElementById('edit-product-id').value;
     const name = document.getElementById('product-name').value.trim();
     const price = parseFloat(document.getElementById('product-price').value);
+    const cost_price = parseFloat(document.getElementById('product-cost').value) || 0;
     const category = document.getElementById('product-category').value;
     const emoji = document.getElementById('product-emoji').value;
     if (!name || !price) return;
@@ -135,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const url = editId ? `/api/products/${editId}` : '/api/products';
       const method = editId ? 'PUT' : 'POST';
-      const res = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, price, category, emoji}) });
+      const res = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, price, cost_price, category, emoji}) });
       if (res.ok) {
         closeModal();
         showToast(editId ? 'Producto actualizado' : 'Producto agregado');
@@ -355,8 +357,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // HOY
       const todayStr = new Date().toLocaleDateString('es-DO',{weekday:'long', day:'numeric', month:'long'});
       const totalEl = document.getElementById('report-total');
+      const profitEl = document.getElementById('report-profit');
       const countEl = document.getElementById('report-count');
-      if (totalEl) totalEl.textContent = '$' + (stats.daily_profit || 0).toFixed(2);
+      if (totalEl) totalEl.textContent = '$' + (stats.daily_revenue || 0).toFixed(2);
+      if (profitEl) profitEl.textContent = '$' + (stats.daily_profit || 0).toFixed(2);
       if (countEl) countEl.textContent = stats.daily_count || 0;
 
       // Mostrar fecha de hoy en la tarjeta

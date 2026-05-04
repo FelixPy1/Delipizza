@@ -57,6 +57,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     price = db.Column(db.Float)
+    cost_price = db.Column(db.Float, default=0.0)
     category = db.Column(db.String(50))
     emoji = db.Column(db.String(10))
 
@@ -65,6 +66,7 @@ class Sale(db.Model):
     product_id = db.Column(db.Integer)
     date = db.Column(db.DateTime, default=datetime.now)
     price_at_sale = db.Column(db.Float)
+    cost_at_sale = db.Column(db.Float, default=0.0)
     quantity = db.Column(db.Integer)
 
 # ── RUTAS ─────────────────────────────────────────
@@ -90,13 +92,19 @@ def index():
 @app.route('/api/products')
 def products():
     return jsonify([{
-        "id":p.id,"name":p.name,"price":p.price,"category":p.category,"emoji":p.emoji
+        "id":p.id,"name":p.name,"price":p.price,"cost_price":p.cost_price,"category":p.category,"emoji":p.emoji
     } for p in Product.query.all()])
 
 @app.route('/api/products', methods=['POST'])
 def add_product():
     data = request.json
-    p = Product(**data)
+    p = Product(
+        name=data['name'],
+        price=data['price'],
+        cost_price=data.get('cost_price', 0),
+        category=data.get('category', 'Pizza'),
+        emoji=data.get('emoji', '🍕')
+    )
     db.session.add(p)
     db.session.commit()
     return jsonify({"ok":True})
@@ -107,10 +115,14 @@ def stats():
     today = datetime.now().date()
     daily_sales = [s for s in sales if s.date.date() == today]
     
+    daily_profit = sum(s.price_at_sale - (s.cost_at_sale or 0) for s in daily_sales)
+    monthly_profit = sum(s.price_at_sale - (s.cost_at_sale or 0) for s in sales if s.date.month == today.month and s.date.year == today.year)
+    
     return jsonify({
-        "daily_profit": sum(s.price_at_sale for s in daily_sales),
+        "daily_revenue": sum(s.price_at_sale for s in daily_sales),
+        "daily_profit": daily_profit,
         "daily_count": len(daily_sales),
-        "monthly_profit": sum(s.price_at_sale for s in sales if s.date.month == today.month and s.date.year == today.year)
+        "monthly_profit": monthly_profit
     })
 
 # --- PRODUCTOS (EXTENDIDO) ---
@@ -120,6 +132,7 @@ def update_product(id):
     data = request.json
     p.name = data.get('name', p.name)
     p.price = data.get('price', p.price)
+    p.cost_price = data.get('cost_price', p.cost_price)
     p.category = data.get('category', p.category)
     p.emoji = data.get('emoji', p.emoji)
     db.session.commit()
@@ -140,12 +153,14 @@ def add_sale():
     if not prod: return jsonify({"error":"Product not found"}), 404
     
     qty = data.get('quantity', 1)
-    total = prod.price * qty
+    total_price = prod.price * qty
+    total_cost = (prod.cost_price or 0) * qty
     
     s = Sale(
         product_id=prod.id,
         quantity=qty,
-        price_at_sale=total
+        price_at_sale=total_price,
+        cost_at_sale=total_cost
     )
     db.session.add(s)
     db.session.commit()

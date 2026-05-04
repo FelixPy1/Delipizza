@@ -180,6 +180,20 @@
                     <div class="mc-delta" id="report-delta">hoy</div>
                 </div>
 
+                <!-- Ganancia de HOY -->
+                <div class="metric-card" style="background: linear-gradient(135deg, #059669, #047857); border:none; box-shadow: 0 10px 30px rgba(5,150,105,0.25);">
+                    <div class="mc-header">
+                        <span class="mc-label" style="color: #A7F3D0;">Ganancia Limpia</span>
+                        <div class="mc-icon-wrap" style="background: rgba(255,255,255,0.15); color: #fff;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mc-value" id="report-profit" style="color: #fff;">$0.00</div>
+                    <div class="mc-delta" style="color: #A7F3D0;">después de costos</div>
+                </div>
+
                 <!-- Pedidos hoy -->
                 <div class="metric-card mc-orange">
                     <div class="mc-header">
@@ -521,12 +535,21 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group" style="flex:1">
-                        <label for="product-price">Precio (RD$)</label>
+                        <label for="product-price">Precio Venta (RD$)</label>
                         <div class="input-prefix-wrapper">
                             <span class="input-prefix">$</span>
                             <input type="number" id="product-price" step="0.01" min="0" required placeholder="0.00">
                         </div>
                     </div>
+                    <div class="form-group" style="flex:1">
+                        <label for="product-cost">Costo Compra (RD$)</label>
+                        <div class="input-prefix-wrapper" style="border-color: var(--border);">
+                            <span class="input-prefix" style="color: var(--text-muted);">$</span>
+                            <input type="number" id="product-cost" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
                     <div class="form-group" style="flex:1">
                         <label for="product-category">Categoría</label>
                         <select id="product-category">
