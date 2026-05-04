@@ -153,7 +153,7 @@ def add_sale():
     # Return full data for the invoice modal
     return jsonify({
         "id": s.id,
-        "invoice_number": f"FAC-{str(s.id).padStart(4,'0')}",
+        "invoice_number": f"FAC-{str(s.id).zfill(4)}",
         "product_name": prod.name,
         "product_emoji": prod.emoji,
         "quantity": s.quantity,
@@ -193,7 +193,7 @@ def sales_history():
             "date": s.date.isoformat(),
             "quantity": s.quantity,
             "price_at_sale": s.price_at_sale,
-            "invoice_number": f"FAC-{str(s.id).padStart(4,'0')}"
+            "invoice_number": f"FAC-{str(s.id).zfill(4)}"
         })
     return jsonify(results)
 
