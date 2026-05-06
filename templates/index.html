@@ -6,7 +6,7 @@
     <title>Deli-Pizza M&A — Sistema de Gestión</title>
     <meta name="description" content="Sistema de punto de venta y gestión para Deli-Pizza M&A">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/styles.css?v=2.1">
+    <link rel="stylesheet" href="/static/css/styles.css?v=2.2">
 </head>
 <body>
 
@@ -136,11 +136,7 @@
                 <div class="cat-tabs-wrap">
                     <div class="cat-tabs" id="cat-tabs">
                         <button class="cat-tab active" data-cat="all">Todos</button>
-                        <button class="cat-tab" data-cat="Pizza">🍕 Pizzas</button>
-                        <button class="cat-tab" data-cat="Papas">🍟 Papas</button>
-                        <button class="cat-tab" data-cat="Bebidas">🥤 Bebidas</button>
-                        <button class="cat-tab" data-cat="Sandwich">🥪 Sandwich</button>
-                        <button class="cat-tab" data-cat="Nuggets">🍗 Nuggets</button>
+                        <!-- Cargado dinámicamente -->
                     </div>
                 </div>
             </div>
@@ -565,13 +561,15 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group" style="flex:1">
-                        <label for="product-category">Categoría</label>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+                            <label for="product-category" style="margin:0">Categoría</label>
+                            <button type="button" class="btn-manage-cats-premium" id="btn-manage-cats">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                                Gestionar Categorías
+                            </button>
+                        </div>
                         <select id="product-category">
-                            <option value="Pizza">🍕 Pizza</option>
-                            <option value="Papas">🍟 Papas</option>
-                            <option value="Bebidas">🥤 Bebidas</option>
-                            <option value="Sandwich">🥪 Sandwich</option>
-                            <option value="Nuggets">🍗 Nuggets</option>
+                            <!-- Cargado dinámicamente -->
                         </select>
                     </div>
                 </div>
@@ -580,6 +578,43 @@
                     <button type="submit" class="btn-primary" id="modal-submit-btn">Guardar Producto</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: CATEGORY MANAGER ========== -->
+    <div id="cat-manager-modal" class="modal">
+        <div class="modal-backdrop" id="cat-manager-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h2>Gestionar Categorías</h2>
+                    <p class="modal-subtitle">Agrega o edita las categorías del menú</p>
+                </div>
+                <button class="modal-close" id="close-cat-manager">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="cat-manager-body">
+                <!-- Formulario agregar/editar -->
+                <div class="cat-add-form">
+                    <input type="hidden" id="edit-cat-id">
+                    <input type="text" id="new-cat-emoji" placeholder="🍕" style="width:50px; text-align:center">
+                    <input type="text" id="new-cat-name" placeholder="Categoría..." style="flex:1">
+                    <button class="btn-primary btn-sm" id="btn-save-new-cat">Guardar</button>
+                    <button class="btn-ghost btn-sm" id="btn-cancel-cat-edit" style="display:none">✕</button>
+                </div>
+
+                <div class="cat-list" id="cat-manager-list">
+                    <!-- Lista de categorías cargada por JS -->
+                </div>
+            </div>
+
+            <div class="modal-actions" style="padding: 0 32px 32px">
+                <button class="btn-ghost" id="finish-cat-manager" style="width:100%">Finalizar</button>
+            </div>
         </div>
     </div>
 
@@ -615,7 +650,7 @@
         <span id="toast-msg">Venta registrada</span>
     </div>
 
-    <script src="/static/js/app.js?v=2.1"></script>
+    <script src="/static/js/app.js?v=2.2"></script>
     <script src="/static/js/notes.js"></script>
 </body>
 </html>

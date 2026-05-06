@@ -74,6 +74,11 @@ class Product(db.Model):
     category = db.Column(db.String(50))
     emoji = db.Column(db.String(10))
 
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    emoji = db.Column(db.String(10))
+
 class Sale(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer)
@@ -100,6 +105,55 @@ def logout():
 @login_required
 def index():
     return render_template('index.html')
+
+# CATEGORIAS
+@app.route('/api/categories')
+def get_categories():
+    return jsonify([{
+        "id": c.id, "name": c.name, "emoji": c.emoji
+    } for c in Category.query.all()])
+
+@app.route('/api/categories', methods=['POST'])
+def add_category():
+    data = request.json
+    if Category.query.filter_by(name=data['name']).first():
+        return jsonify({"error": "La categoría ya existe"}), 400
+    c = Category(name=data['name'], emoji=data.get('emoji', '📁'))
+    db.session.add(c)
+    db.session.commit()
+    return jsonify({"ok": True})
+
+@app.route('/api/categories/<int:id>', methods=['PUT'])
+def update_category(id):
+    c = Category.query.get_or_404(id)
+    data = request.json
+    old_name = c.name
+    new_name = data.get('name', c.name)
+    
+    # Si cambió el nombre, actualizamos los productos
+    if old_name != new_name:
+        products = Product.query.filter_by(category=old_name).all()
+        for p in products:
+            p.category = new_name
+            
+    c.name = new_name
+    c.emoji = data.get('emoji', c.emoji)
+    db.session.commit()
+    return jsonify({"ok": True})
+
+@app.route('/api/categories/<int:id>', methods=['DELETE'])
+def delete_category(id):
+    c = Category.query.get_or_404(id)
+    name = c.name
+    
+    # Actualizar productos a 'General' (o Pizza si prefieres) para que no queden huérfanos
+    products = Product.query.filter_by(category=name).all()
+    for p in products:
+        p.category = 'General'
+        
+    db.session.delete(c)
+    db.session.commit()
+    return jsonify({"ok": True})
 
 # PRODUCTOS
 @app.route('/api/products')
@@ -238,21 +292,27 @@ def void_sale(id):
 
 # ── INIT ──────────────────────────────────────────
 with app.app_context():
-    # Intento de migración automática simple para SQLite/Render
-    try:
-        db.create_all() # Asegurar que las tablas existen primero
-        from sqlalchemy import inspect
-        inspector = inspect(db.engine)
-        columns = [c['name'] for c in inspector.get_columns('product')]
-        if 'cost_price' not in columns:
-            print("Esquema antiguo detectado. Recreando base de datos...")
-            db.drop_all()
-            db.create_all()
-    except Exception as e:
-        print(f"Error al verificar esquema: {e}")
-        db.create_all()
+    # Creamos las tablas de forma segura (sin borrar nada)
+    db.create_all()
 
-    # Semilla de datos si está vacío o si falla el count
+    # Semilla de categorías si está vacío
+    try:
+        if Category.query.count() == 0:
+            print("Sembrando categorías iniciales...")
+            cats = [
+                Category(name="Pizza", emoji="🍕"),
+                Category(name="Papas", emoji="🍟"),
+                Category(name="Bebidas", emoji="🥤"),
+                Category(name="Sandwich", emoji="🥪"),
+                Category(name="Nuggets", emoji="🍗")
+            ]
+            db.session.add_all(cats)
+            db.session.commit()
+    except Exception as e:
+        print(f"Error sembrando categorías: {e}")
+        db.session.rollback()
+
+    # Semilla de productos (solo si está vacío)
     try:
         if Product.query.count() == 0:
             print("Sembrando datos iniciales...")
@@ -261,8 +321,9 @@ with app.app_context():
             p3 = Product(name="Refresco 16oz", price=75, cost_price=40, category="Bebidas", emoji="🥤")
             db.session.add_all([p1, p2, p3])
             db.session.commit()
-    except:
+    except Exception as e:
+        print(f"Error sembrando productos: {e}")
         db.session.rollback()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=True)

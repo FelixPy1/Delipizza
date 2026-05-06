@@ -747,8 +747,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);displ
 }
 
 @media (max-width: 768px) {
-
-
+    /* (Sección vacía o para ajustes futuros) */
+}
 
 @media print{
   body *{visibility:hidden!important;}
@@ -794,4 +794,43 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);displ
     margin-top: 8px;
     font-weight: 800;
     color: #059669;
+}
+/* ======== CATEGORY MANAGER ======== */
+.cat-manager-body { padding: 0 32px 24px; }
+.cat-add-form { display: flex; gap: 10px; margin-bottom: 24px; }
+.cat-add-form input { padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text); }
+.cat-list { display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
+.cat-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; }
+.cat-item-emoji { font-size: 1.2rem; width: 30px; text-align: center; }
+.cat-item-name { flex: 1; font-size: 0.9rem; font-weight: 600; color: var(--text); }
+.btn-manage-cats-premium {
+    background: linear-gradient(135deg, var(--orange), var(--orange-d)) !important;
+    color: #fff !important;
+    border: none !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    padding: 8px 14px !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    transition: var(--tr) !important;
+    box-shadow: 0 4px 12px var(--orange-glow) !important;
+}
+.btn-manage-cats-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--orange-glow);
+}
+.btn-manage-cats-premium svg { stroke: #fff; }
+
+.cat-item .btn-edit-cat:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-glow); }
+.cat-item .btn-delete-cat:hover { border-color: #EF4444; color: #EF4444; background: rgba(239,68,68,0.1); }
+
+@media (max-width: 480px) {
+    .cat-add-form { flex-direction: column; gap: 8px; }
+    .cat-add-form #new-cat-emoji { width: 100% !important; text-align: left; }
+    .cat-manager-body { padding: 0 16px 20px; }
 }

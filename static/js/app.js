@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // ---- MOBILE MENU ----
   const sidebar = document.getElementById('sidebar');
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
@@ -65,13 +65,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---- EMOJI SELECTOR ----
   let selectedEmoji = '🍕';
-  const EMOJI_TO_CAT = {'🍕':'Pizza','🍟':'Papas','🥤':'Bebidas','🥪':'Sandwich','🍗':'Nuggets'};
+  let EMOJI_TO_CAT = {}; // Se llena dinámicamente
+
   document.querySelectorAll('.emoji-opt').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       selectedEmoji = btn.dataset.emoji;
       document.getElementById('product-emoji').value = selectedEmoji;
+      
       // Auto-select matching category
       const catSel = document.getElementById('product-category');
       const matchCat = EMOJI_TO_CAT[selectedEmoji];
@@ -79,7 +81,195 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ---- MODAL PRODUCT ----
+  // ---- CATEGORY MANAGEMENT ----
+  let CAT_TO_EMOJI = {};
+
+  async function loadCategories() {
+    try {
+      const res = await fetch('/api/categories');
+      const cats = await res.json();
+      
+      // Actualizar mapeos
+      EMOJI_TO_CAT = {};
+      CAT_TO_EMOJI = {};
+      cats.forEach(c => { 
+        EMOJI_TO_CAT[c.emoji] = c.name; 
+        CAT_TO_EMOJI[c.name] = c.emoji;
+      });
+
+      // Actualizar Selector de Emojis en el Modal (Dinámico)
+      const emojiSelector = document.getElementById('emoji-selector');
+      if (emojiSelector) {
+        emojiSelector.innerHTML = '';
+        cats.forEach(c => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'emoji-opt' + (c.emoji === selectedEmoji ? ' active' : '');
+          btn.dataset.emoji = c.emoji;
+          btn.title = c.name;
+          btn.textContent = c.emoji;
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedEmoji = c.emoji;
+            document.getElementById('product-emoji').value = selectedEmoji;
+            
+            // Auto-select category
+            const catSel = document.getElementById('product-category');
+            if (catSel) catSel.value = c.name;
+          });
+          emojiSelector.appendChild(btn);
+        });
+      }
+
+      // Actualizar Tabs de POS
+      const tabsWrap = document.getElementById('cat-tabs');
+      const activeTab = tabsWrap.querySelector('.cat-tab.active');
+      const currentActiveCat = activeTab ? activeTab.dataset.cat : 'all';
+      
+      tabsWrap.innerHTML = '<button class="cat-tab" data-cat="all">Todos</button>';
+      cats.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'cat-tab' + (c.name === currentActiveCat ? ' active' : '');
+        btn.dataset.cat = c.name;
+        btn.innerHTML = `${c.emoji} ${c.name}`;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#cat-tabs .cat-tab').forEach(t => t.classList.remove('active'));
+          btn.classList.add('active');
+          loadProducts(btn.dataset.cat, posSearchInput.value);
+        });
+        tabsWrap.appendChild(btn);
+      });
+      // Restaurar "Todos" si nada está activo
+      if (!tabsWrap.querySelector('.cat-tab.active')) tabsWrap.querySelector('[data-cat="all"]').classList.add('active');
+
+      // Actualizar Selector en Modal de Producto
+      const catSel = document.getElementById('product-category');
+      const currentVal = catSel.value;
+      catSel.innerHTML = '';
+      cats.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.name;
+        opt.textContent = `${c.emoji} ${c.name}`;
+        catSel.appendChild(opt);
+      });
+      if (currentVal) catSel.value = currentVal;
+
+      // Actualizar Lista en Gestor de Categorías
+      const mgrList = document.getElementById('cat-manager-list');
+      mgrList.innerHTML = '';
+      cats.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'cat-item';
+        item.innerHTML = `
+          <span class="cat-item-emoji">${c.emoji}</span>
+          <span class="cat-item-name">${c.name}</span>
+          <div class="cat-item-actions" style="display:flex; gap:5px">
+            <button class="btn-icon btn-edit-cat" title="Editar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="btn-icon btn-delete-cat" title="Eliminar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+          </div>
+        `;
+        item.querySelector('.btn-edit-cat').addEventListener('click', () => {
+          document.getElementById('edit-cat-id').value = c.id;
+          document.getElementById('new-cat-name').value = c.name;
+          document.getElementById('new-cat-emoji').value = c.emoji;
+          document.getElementById('btn-save-new-cat').textContent = 'Actualizar';
+          document.getElementById('btn-cancel-cat-edit').style.display = 'block';
+          document.getElementById('new-cat-name').focus();
+        });
+        item.querySelector('.btn-delete-cat').addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const confirmed = window.confirm(`¿Eliminar categoría "${c.name}"? Los productos que la usan se moverán a "General".`);
+          if (!confirmed) return;
+          
+          try {
+            const r = await fetch(`/api/categories/${c.id}`, { method: 'DELETE' });
+            if (r.ok) {
+              showToast('Categoría eliminada');
+              await loadCategories();
+            } else {
+              const errData = await r.json();
+              showToast(errData.error || 'Error al eliminar', 'error');
+            }
+          } catch (err) {
+            console.error("Error deleting category:", err);
+            showToast('Error de conexión', 'error');
+          }
+        });
+        mgrList.appendChild(item);
+      });
+
+    } catch (err) { console.error("Error cargando categorías:", err); }
+  }
+
+  // Eventos del Gestor de Categorías
+  const catModal = document.getElementById('cat-manager-modal');
+  document.getElementById('btn-manage-cats').addEventListener('click', () => {
+    loadCategories();
+    catModal.classList.add('active');
+  });
+  document.getElementById('close-cat-manager').addEventListener('click', () => catModal.classList.remove('active'));
+  document.getElementById('finish-cat-manager').addEventListener('click', () => {
+    catModal.classList.remove('active');
+    resetCatForm();
+  });
+
+  function resetCatForm() {
+    document.getElementById('edit-cat-id').value = '';
+    document.getElementById('new-cat-name').value = '';
+    document.getElementById('new-cat-emoji').value = '';
+    document.getElementById('btn-save-new-cat').textContent = 'Guardar';
+    document.getElementById('btn-cancel-cat-edit').style.display = 'none';
+  }
+
+  document.getElementById('btn-cancel-cat-edit').addEventListener('click', resetCatForm);
+
+  document.getElementById('btn-save-new-cat').addEventListener('click', async () => {
+    const editId = document.getElementById('edit-cat-id').value;
+    const name = document.getElementById('new-cat-name').value.trim();
+    const emoji = document.getElementById('new-cat-emoji').value.trim() || '🍕';
+    if (!name) return;
+
+    const url = editId ? `/api/categories/${editId}` : '/api/categories';
+    const method = editId ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method: method,
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({name, emoji})
+    });
+    if (res.ok) {
+      resetCatForm();
+      showToast(editId ? 'Categoría actualizada' : 'Categoría agregada');
+      loadCategories();
+    } else {
+      const data = await res.json();
+      showToast(data.error || 'Error', 'error');
+    }
+  });
+
+  // Auto-seleccionar emoji cuando cambia la categoría
+  const productCatSel = document.getElementById('product-category');
+  if (productCatSel) {
+    productCatSel.addEventListener('change', () => {
+      const cat = productCatSel.value;
+      const emoji = CAT_TO_EMOJI[cat];
+      if (emoji) {
+        selectedEmoji = emoji;
+        document.getElementById('product-emoji').value = emoji;
+        // Resaltar en el selector si existe
+        document.querySelectorAll('.emoji-opt').forEach(b => {
+          if (b.dataset.emoji === emoji) b.classList.add('active');
+          else b.classList.remove('active');
+        });
+      }
+    });
+  }
   const modal = document.getElementById('product-modal');
   const form = document.getElementById('product-form');
   const modalTitle = document.getElementById('modal-title');
@@ -266,16 +456,10 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch { showToast('Error al eliminar','error'); }
   });
 
-  const CAT_NORM = {
-    'pizza':'Pizza','pizzas':'Pizza',
-    'papas':'Papas','papa':'Papas','fries':'Papas',
-    'bebidas':'Bebidas','bebida':'Bebidas','drink':'Bebidas',
-    'sandwich':'Sandwich','sandwitch':'Sandwich','sandwiches':'Sandwich',
-    'nuggets':'Nuggets','nugget':'Nuggets',
-  };
   function normCat(c) {
-    const k = (c||'').toLowerCase().trim();
-    return CAT_NORM[k] || c || 'Pizza';
+    if (!c) return 'General';
+    // Si la categoría no existe en el mapeo actual, la tratamos como General para evitar que el producto desaparezca
+    return CAT_TO_EMOJI[c] ? c : 'General';
   }
 
   let allPOSProducts = [];
@@ -338,13 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  document.querySelectorAll('#cat-tabs .cat-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('#cat-tabs .cat-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      loadProducts(tab.dataset.cat, posSearchInput.value);
-    });
-  });
+  // Eventos de tabs de POS se manejan ahora en loadCategories
 
   async function loadStats() {
     try {
@@ -586,6 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ---- INIT ----
+  await loadCategories();
   loadProducts();
   loadReports();
   loadHistorial('today');
