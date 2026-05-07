@@ -246,27 +246,91 @@ def add_sale():
     total_price = prod.price * qty
     total_cost = (prod.cost_price or 0) * qty
     
+    now = get_now()
     s = Sale(
         product_id=prod.id,
         quantity=qty,
         price_at_sale=total_price,
-        cost_at_sale=total_cost
+        cost_at_sale=total_cost,
+        date=now
     )
     db.session.add(s)
     db.session.commit()
     
-    # Return full data for the invoice modal
     return jsonify({
         "id": s.id,
         "invoice_number": f"FAC-{str(s.id).zfill(4)}",
-        "product_name": prod.name,
-        "product_emoji": prod.emoji,
-        "quantity": s.quantity,
-        "price_at_sale": s.price_at_sale,
-        "cost_at_sale": s.cost_at_sale,
-        "profit_at_sale": s.price_at_sale - s.cost_at_sale,
         "date": s.date.isoformat(),
-        "unit_price": prod.price
+        "total_price": s.price_at_sale,
+        "total_cost": s.cost_at_sale,
+        "total_profit": s.price_at_sale - s.cost_at_sale,
+        "total_quantity": s.quantity,
+        "items": [{
+            "product_name": prod.name,
+            "product_emoji": prod.emoji,
+            "quantity": s.quantity,
+            "price_at_sale": s.price_at_sale,
+            "unit_price": prod.price
+        }]
+    })
+
+@app.route('/api/sales/batch', methods=['POST'])
+def add_sale_batch():
+    items_data = request.json.get('items', [])
+    if not items_data:
+        return jsonify({"error": "No items"}), 400
+        
+    now = get_now()
+    sales_created = []
+    
+    for item in items_data:
+        prod = Product.query.get(item['product_id'])
+        if not prod: continue
+        qty = item.get('quantity', 1)
+        
+        s = Sale(
+            product_id=prod.id,
+            quantity=qty,
+            price_at_sale=prod.price * qty,
+            cost_at_sale=(prod.cost_price or 0) * qty,
+            date=now
+        )
+        db.session.add(s)
+        sales_created.append((s, prod))
+        
+    db.session.commit()
+    
+    if not sales_created:
+        return jsonify({"error": "No valid items"}), 400
+        
+    first_sale = sales_created[0][0]
+    
+    resp_items = []
+    total_price = 0
+    total_cost = 0
+    total_qty = 0
+    
+    for s, prod in sales_created:
+        total_price += s.price_at_sale
+        total_cost += s.cost_at_sale
+        total_qty += s.quantity
+        resp_items.append({
+            "product_name": prod.name,
+            "product_emoji": prod.emoji,
+            "quantity": s.quantity,
+            "price_at_sale": s.price_at_sale,
+            "unit_price": prod.price
+        })
+        
+    return jsonify({
+        "id": first_sale.id,
+        "invoice_number": f"FAC-{str(first_sale.id).zfill(4)}",
+        "date": first_sale.date.isoformat(),
+        "total_price": total_price,
+        "total_cost": total_cost,
+        "total_profit": total_price - total_cost,
+        "total_quantity": total_qty,
+        "items": resp_items
     })
 
 @app.route('/api/sales/history')
@@ -286,30 +350,50 @@ def sales_history():
         query = query.filter(db.func.extract('month', Sale.date) == now.month)
         
     if pid != 'all':
-        query = query.filter(Sale.product_id == int(pid))
+        # Encontrar las fechas que contienen este producto
+        dates_with_product = [s.date for s in query.filter(Sale.product_id == int(pid)).all()]
+        if not dates_with_product:
+            return jsonify([])
+        query = query.filter(Sale.date.in_(dates_with_product))
 
     sales = query.order_by(Sale.date.desc()).all()
     
-    results = []
+    grouped_sales = {}
     for s in sales:
+        date_str = s.date.isoformat()
+        if date_str not in grouped_sales:
+            grouped_sales[date_str] = {
+                "id": s.id,
+                "invoice_number": f"FAC-{str(s.id).zfill(4)}",
+                "date": date_str,
+                "items": [],
+                "total_price": 0,
+                "total_cost": 0,
+                "total_profit": 0,
+                "total_quantity": 0
+            }
+            
         p = Product.query.get(s.product_id)
-        results.append({
-            "id": s.id,
+        grouped_sales[date_str]["items"].append({
             "product_name": p.name if p else "Producto Eliminado",
             "product_emoji": p.emoji if p else "❓",
-            "date": s.date.isoformat(),
             "quantity": s.quantity,
             "price_at_sale": s.price_at_sale,
-            "cost_at_sale": s.cost_at_sale,
-            "profit_at_sale": s.price_at_sale - (s.cost_at_sale or 0),
-            "invoice_number": f"FAC-{str(s.id).zfill(4)}"
+            "unit_price": p.price if p else (s.price_at_sale / s.quantity)
         })
-    return jsonify(results)
+        grouped_sales[date_str]["total_price"] += s.price_at_sale
+        grouped_sales[date_str]["total_cost"] += (s.cost_at_sale or 0)
+        grouped_sales[date_str]["total_profit"] += (s.price_at_sale - (s.cost_at_sale or 0))
+        grouped_sales[date_str]["total_quantity"] += s.quantity
+        
+    return jsonify(list(grouped_sales.values()))
 
 @app.route('/api/sales/<int:id>', methods=['DELETE'])
 def void_sale(id):
     s = Sale.query.get_or_404(id)
-    db.session.delete(s)
+    sales_to_delete = Sale.query.filter_by(date=s.date).all()
+    for sale in sales_to_delete:
+        db.session.delete(sale)
     db.session.commit()
     return jsonify({"ok":True})
 

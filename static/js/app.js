@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  let cart = [];
+
   // ---- MOBILE MENU ----
   const sidebar = document.getElementById('sidebar');
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
@@ -367,41 +369,134 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('sale-modal-backdrop').addEventListener('click', closeSaleModal);
   document.getElementById('confirm-sale-btn').addEventListener('click', async () => {
     if (!saleProduct) return;
-    const btn = document.getElementById('confirm-sale-btn');
-    btn.disabled = true;
-    btn.textContent = 'Registrando...';
     
-    const payload = {product_id: saleProduct.id, quantity: saleQty};
+    // Check if already in cart
+    const existing = cart.find(item => item.product.id === saleProduct.id);
+    if (existing) {
+      existing.quantity += saleQty;
+    } else {
+      cart.push({ product: saleProduct, quantity: saleQty });
+    }
     
-    if (!navigator.onLine) {
-        // Modo offline: encolar
-        saveSaleOffline(payload);
-        closeSaleModal();
-        showToast(`✓ Venta guardada en espera de red`, 'success');
-        btn.disabled = false;
-        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Confirmar Venta';
-        return;
-    }
-
-    try {
-      const res = await fetch('/api/sales', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        const saleData = await res.json();
-        closeSaleModal();
-        showToast(`✓ "${saleData.product_name}" registrado`);
-        showInvoiceModal(saleData);
-      }
-    } catch { 
-        saveSaleOffline(payload);
-        closeSaleModal();
-        showToast('Guardado localmente por fallo de red', 'success');
-    }
-    finally { btn.disabled = false; btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Confirmar Venta'; }
+    closeSaleModal();
+    renderCart();
+    showToast(`✓ Agregado al carrito`);
   });
+
+  // ---- CART LOGIC ----
+
+  
+  function renderCart() {
+    const container = document.getElementById('cart-items-container');
+    const totalItemsEl = document.getElementById('cart-total-items');
+    const totalPriceEl = document.getElementById('cart-total-price');
+    const checkoutBtn = document.getElementById('btn-checkout');
+    
+    container.innerHTML = '';
+    
+    if (cart.length === 0) {
+      container.innerHTML = `<div class="cart-empty-text">El carrito está vacío</div>`;
+      totalItemsEl.textContent = '0';
+      totalPriceEl.textContent = '$0.00';
+      if(checkoutBtn) checkoutBtn.disabled = true;
+      return;
+    }
+    
+    let totalItems = 0;
+    let totalPrice = 0;
+    
+    cart.forEach((item, index) => {
+      totalItems += item.quantity;
+      totalPrice += item.quantity * item.product.price;
+      
+      const div = document.createElement('div');
+      div.className = 'cart-bar-item';
+      div.innerHTML = `
+        <span class="cart-bar-item-qty">${item.quantity}x</span>
+        <span class="cart-bar-item-name">${item.product.name}</span>
+        <span class="cart-bar-item-price">$${(item.product.price * item.quantity).toFixed(2)}</span>
+        <button class="cart-item-del" data-index="${index}" title="Eliminar">×</button>
+      `;
+      container.appendChild(div);
+    });
+    
+    totalItemsEl.textContent = totalItems;
+    totalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+    if(checkoutBtn) checkoutBtn.disabled = false;
+    
+    // Attach delete events
+    container.querySelectorAll('.cart-item-del').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.currentTarget.dataset.index);
+        cart.splice(idx, 1);
+        renderCart();
+      });
+    });
+
+  }
+  
+  const btnClearCart = document.getElementById('btn-clear-cart');
+  if(btnClearCart) {
+    btnClearCart.addEventListener('click', () => {
+      if(cart.length > 0 && confirm('¿Vaciar el carrito?')) {
+        cart = [];
+        renderCart();
+      }
+    });
+  }
+
+  const btnCheckout = document.getElementById('btn-checkout');
+  if(btnCheckout) {
+      btnCheckout.addEventListener('click', async () => {
+        if (cart.length === 0) return;
+        
+        const btn = document.getElementById('btn-checkout');
+        btn.disabled = true;
+        btn.textContent = 'Cobrando...';
+        
+        const payload = {
+          items: cart.map(item => ({ product_id: item.product.id, quantity: item.quantity }))
+        };
+        
+        if (!navigator.onLine) {
+            saveSaleOffline(payload);
+            cart = [];
+            renderCart();
+            showToast(`✓ Factura guardada en espera de red`, 'success');
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Cobrar';
+            return;
+        }
+
+        try {
+          const res = await fetch('/api/sales/batch', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            const invoiceData = await res.json();
+            cart = [];
+            renderCart();
+            showToast(`✓ Venta registrada`);
+            showInvoiceModal(invoiceData);
+          } else {
+            showToast('Error al procesar la venta', 'error');
+          }
+        } catch { 
+            saveSaleOffline(payload);
+            cart = [];
+            renderCart();
+            showToast('Guardado localmente por fallo de red', 'success');
+        }
+        finally { 
+            btn.disabled = false; 
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Cobrar'; 
+        }
+      });
+  }
+    
+
 
 
   // ---- INVOICE MODAL ----
@@ -414,19 +509,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     const timeStr = dateObj.toLocaleTimeString('es-DO', {timeZone: 'America/Santo_Domingo', hour:'2-digit', minute:'2-digit'});
     document.getElementById('inv-number').textContent = sale.invoice_number || `FAC-${String(sale.id).padStart(4,'0')}`;
     document.getElementById('inv-datetime').textContent = `${dateStr.charAt(0).toUpperCase()+dateStr.slice(1)} · ${timeStr}`;
-    document.getElementById('inv-product-name').textContent = `${sale.product_emoji || '🍕'} ${sale.product_name}`;
-    document.getElementById('inv-qty').textContent = sale.quantity;
-    const unitPrice = sale.unit_price || (sale.price_at_sale / sale.quantity);
-    document.getElementById('inv-unit-price').textContent = `$${unitPrice.toFixed(2)}`;
-    document.getElementById('inv-item-total').textContent = `$${sale.price_at_sale.toFixed(2)}`;
-    document.getElementById('inv-grand-total').textContent = `$${sale.price_at_sale.toFixed(2)}`;
+    
+    const listEl = document.getElementById('inv-items-list');
+    listEl.innerHTML = '';
+    
+    if (sale.items) {
+        sale.items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'inv-item-row';
+            div.innerHTML = `
+                <span class="inv-col-product">${item.product_emoji || '🍕'} ${item.product_name}</span>
+                <span class="inv-col-qty">${item.quantity}</span>
+                <span class="inv-col-pu">$${item.unit_price.toFixed(2)}</span>
+                <span class="inv-col-total">$${item.price_at_sale.toFixed(2)}</span>
+            `;
+            listEl.appendChild(div);
+        });
+    }
+
+    document.getElementById('inv-grand-total').textContent = `$${sale.total_price.toFixed(2)}`;
     
     // Datos Internos
     const costEl = document.getElementById('inv-internal-cost');
-    if (costEl) costEl.textContent = `$${(sale.cost_at_sale || 0).toFixed(2)}`;
+    if (costEl) costEl.textContent = `$${(sale.total_cost || 0).toFixed(2)}`;
     
     const profitEl = document.getElementById('inv-internal-profit');
-    if (profitEl) profitEl.textContent = `$${(sale.profit_at_sale || 0).toFixed(2)}`;
+    if (profitEl) profitEl.textContent = `$${(sale.total_profit || 0).toFixed(2)}`;
     
     document.getElementById('invoice-modal').classList.add('active');
   }
@@ -440,19 +548,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('invoice-modal-backdrop').addEventListener('click', closeInvoiceModal);
   document.getElementById('print-invoice-btn').addEventListener('click', () => window.print());
 
-  document.getElementById('void-invoice-btn').addEventListener('click', async () => {
-    if (!currentSaleId) return;
-    if (!confirm('¿Seguro que deseas ANULAR esta venta? Esta acción no se puede deshacer.')) return;
-    try {
-      const res = await fetch(`/api/sales/${currentSaleId}`, { method: 'DELETE' });
-      if (res.ok) {
-        closeInvoiceModal();
-        showToast('Venta anulada', 'error');
-        loadReports();
-        loadHistorial('today');
-      }
-    } catch { showToast('Error al anular', 'error'); }
-  });
+  const voidInvoiceBtn = document.getElementById('void-invoice-btn');
+  if (voidInvoiceBtn) {
+    voidInvoiceBtn.addEventListener('click', async () => {
+      if (!currentSaleId) return;
+      if (!confirm('¿Seguro que deseas ANULAR esta venta? Esta acción no se puede deshacer.')) return;
+      try {
+        const res = await fetch(`/api/sales/${currentSaleId}`, { method: 'DELETE' });
+        if (res.ok) {
+          closeInvoiceModal();
+          showToast('Venta anulada', 'error');
+          loadReports();
+          loadHistorial('today');
+        }
+      } catch { showToast('Error al anular', 'error'); }
+    });
+  }
 
 
   const deleteModal = document.getElementById('delete-modal');
@@ -581,8 +692,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (th) th.textContent = period === 'today' ? 'Hora' : 'Fecha';
 
       const badge = document.getElementById('sales-count-badge');
-      const total = sales.reduce((s, v) => s + v.price_at_sale, 0);
-      if (badge) badge.textContent = `${sales.length} ventas · $${total.toFixed(2)}`;
+      const total = sales.reduce((s, v) => s + v.total_price, 0);
+      if (badge) badge.textContent = `${sales.length} facturas · $${total.toFixed(2)}`;
 
       const tbody = document.getElementById('sales-table-body');
       if (!sales.length) {
@@ -596,13 +707,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         const timeLabel = period === 'today'
           ? dateObj.toLocaleTimeString('es-DO',{timeZone: 'America/Santo_Domingo', hour:'2-digit',minute:'2-digit'})
           : dateObj.toLocaleDateString('es-DO',{timeZone: 'America/Santo_Domingo', weekday:'short',day:'numeric',month:'short'});
+          
+        const prodName = s.items.length > 1 ? `Varios artículos (${s.items.length})` : `${s.items[0].product_emoji||'🍕'} ${s.items[0].product_name}`;
+        
+        const totalPriceVal = s.total_price || 0;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td data-label="#">#${sales.length-i}</td>
-          <td data-label="Producto"><div class="sale-product"><span class="sale-product-emoji">${s.product_emoji||'🍕'}</span>${s.product_name}</div></td>
+          <td data-label="Factura"><div class="sale-product">${prodName}</div></td>
           <td data-label="${period === 'today' ? 'Hora' : 'Fecha'}" class="table-time">${timeLabel}</td>
-          <td data-label="Cant.">${s.quantity}</td>
-          <td data-label="Total" class="table-amount">$${s.price_at_sale.toFixed(2)}</td>`;
+          <td data-label="Cant.">${s.total_quantity || 0}</td>
+          <td data-label="Total" class="table-amount">$${totalPriceVal.toFixed(2)}</td>`;
         tbody.appendChild(tr);
       });
     } catch(err) { console.error(err); }
@@ -712,9 +827,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       // Update stats bar
-      const total = sales.reduce((s, v) => s + v.price_at_sale, 0);
-      document.getElementById('inv-count-label').textContent = sales.length;
-      document.getElementById('inv-total-label').textContent = `$${total.toFixed(2)}`;
+      const total = sales.reduce((s, v) => s + v.total_price, 0);
+      const countEl = document.getElementById('inv-count-label');
+      const totalEl = document.getElementById('inv-total-label');
+      if (countEl) countEl.textContent = sales.length;
+      if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
 
       const tbody = document.getElementById('invoices-table-body');
       if (!sales.length) {
@@ -728,32 +845,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         const timeLabel = isPeriodToday
           ? dateObj.toLocaleTimeString('es-DO', {timeZone: 'America/Santo_Domingo', hour:'2-digit', minute:'2-digit'})
           : dateObj.toLocaleDateString('es-DO', {timeZone: 'America/Santo_Domingo', weekday:'short', day:'numeric', month:'short'});
-        const unitPrice = s.unit_price || (s.price_at_sale / s.quantity);
         const invNum = s.invoice_number || `FAC-${String(s.id).padStart(4,'0')}`;
+        
+        const prodName = s.items.length > 1 ? `Varios artículos (${s.items.length})` : `${s.items[0].product_emoji||'🍕'} ${s.items[0].product_name}`;
+        const unitPriceStr = s.items.length > 1 ? "-" : `$${s.items[0].unit_price.toFixed(2)}`;
+
+        const totalVal = s.total_price || 0;
+        const qtyVal = s.total_quantity || 0;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td data-label="Factura"><span class="inv-num-badge">${invNum}</span></td>
-          <td data-label="Producto"><div class="sale-product"><span class="sale-product-emoji">${s.product_emoji||'🍕'}</span>${s.product_name}</div></td>
+          <td data-label="Producto"><div class="sale-product">${prodName}</div></td>
           <td data-label="Fecha" class="table-time">${timeLabel}</td>
-          <td data-label="Cantidad">${s.quantity}</td>
-          <td data-label="P/U">$${unitPrice.toFixed(2)}</td>
-          <td data-label="Total" class="table-amount">$${s.price_at_sale.toFixed(2)}</td>
+          <td data-label="Cantidad">${qtyVal}</td>
+          <td data-label="P/U">${unitPriceStr}</td>
+          <td data-label="Total" class="table-amount">$${totalVal.toFixed(2)}</td>
           <td class="table-actions">
             <button class="btn-reprint" title="Reimprimir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> <span>Imprimir</span></button>
-            <button class="btn-void-sale" title="Anular"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg> <span>Anular</span></button>
+            ${window.USER_ROLE === 'admin' ? `<button class="btn-void-sale" title="Anular"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg> <span>Anular</span></button>` : ''}
           </td>`;
+        tbody.appendChild(tr);
         tr.querySelector('.btn-reprint').addEventListener('click', () => showInvoiceModal(s));
-        tr.querySelector('.btn-void-sale').addEventListener('click', async () => {
-          if (!confirm(`¿Anular la factura ${invNum}? Esta acción no se puede deshacer.`)) return;
-          try {
-            const res = await fetch(`/api/sales/${s.id}`, { method: 'DELETE' });
-            if (res.ok) {
-              showToast('Venta anulada', 'error');
-              loadInvoices(invActivePeriod, invActiveProduct);
-              loadReports();
-            }
-          } catch { showToast('Error al anular', 'error'); }
-        });
+        if (window.USER_ROLE === 'admin') {
+          tr.querySelector('.btn-void-sale').addEventListener('click', async () => {
+            if (!confirm(`¿Anular la factura ${invNum}? Esta acción no se puede deshacer.`)) return;
+            try {
+              const res = await fetch(`/api/sales/${s.id}`, { method: 'DELETE' });
+              if (res.ok) {
+                showToast('Venta anulada', 'error');
+                loadInvoices(invActivePeriod, invActiveProduct);
+                loadReports();
+              }
+            } catch { showToast('Error al anular', 'error'); }
+          });
+        }
         tbody.appendChild(tr);
       });
     } catch(err) { console.error(err); }
