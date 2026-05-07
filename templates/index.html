@@ -5,10 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deli-Pizza M&A — Sistema de Gestión</title>
     <meta name="description" content="Sistema de punto de venta y gestión para Deli-Pizza M&A">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#EAB308">
+    <link rel="apple-touch-icon" href="/static/icons/icono.jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/styles.css?v=2.2">
+    <link rel="stylesheet" href="/static/css/styles.css?v=2.3">
 </head>
 <body>
+    <div id="offline-banner" class="offline-banner" style="display: none;">
+        ⚠️ Estás trabajando sin conexión. Las ventas se guardarán y sincronizarán automáticamente.
+    </div>
 
     <!-- ======== SIDEBAR ======== -->
     <aside class="sidebar" id="sidebar">
@@ -656,7 +662,16 @@
         <span id="toast-msg">Venta registrada</span>
     </div>
 
-    <script src="/static/js/app.js?v=2.2"></script>
+    <script src="/static/js/app.js?v=2.3"></script>
     <script src="/static/js/notes.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then((reg) => {
+                    console.log('SW registrado', reg.scope);
+                }).catch(err => console.log('SW fallo', err));
+            });
+        }
+    </script>
 </body>
 </html>

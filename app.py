@@ -1,7 +1,7 @@
 import os
 import sys
 import functools
-from flask import Flask, request, jsonify, render_template, session, redirect
+from flask import Flask, request, jsonify, render_template, session, redirect, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 import pytz
@@ -92,6 +92,14 @@ class Sale(db.Model):
     quantity = db.Column(db.Integer)
 
 # ── RUTAS ─────────────────────────────────────────
+@app.route('/sw.js')
+def service_worker():
+    return send_from_directory(app.static_folder, 'sw.js', mimetype='application/javascript')
+
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory(app.static_folder, 'manifest.json', mimetype='application/json')
+
 @app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':

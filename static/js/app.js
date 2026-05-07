@@ -370,11 +370,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btn = document.getElementById('confirm-sale-btn');
     btn.disabled = true;
     btn.textContent = 'Registrando...';
+    
+    const payload = {product_id: saleProduct.id, quantity: saleQty};
+    
+    if (!navigator.onLine) {
+        // Modo offline: encolar
+        saveSaleOffline(payload);
+        closeSaleModal();
+        showToast(`✓ Venta guardada en espera de red`, 'success');
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Confirmar Venta';
+        return;
+    }
+
     try {
       const res = await fetch('/api/sales', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({product_id: saleProduct.id, quantity: saleQty})
+        body: JSON.stringify(payload)
       });
       if (res.ok) {
         const saleData = await res.json();
@@ -382,7 +395,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         showToast(`✓ "${saleData.product_name}" registrado`);
         showInvoiceModal(saleData);
       }
-    } catch { showToast('Error al registrar', 'error'); }
+    } catch { 
+        saveSaleOffline(payload);
+        closeSaleModal();
+        showToast('Guardado localmente por fallo de red', 'success');
+    }
     finally { btn.disabled = false; btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Confirmar Venta'; }
   });
 
@@ -770,4 +787,68 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadProducts();
   loadReports();
   loadHistorial('today');
+
+  // ---- OFFLINE SYNC LOGIC ----
+  function saveSaleOffline(saleData) {
+      let queue = JSON.parse(localStorage.getItem('offlineSales') || '[]');
+      queue.push(saleData);
+      localStorage.setItem('offlineSales', JSON.stringify(queue));
+  }
+
+  async function syncOfflineSales() {
+      let queue = JSON.parse(localStorage.getItem('offlineSales') || '[]');
+      if (queue.length === 0) return;
+      
+      showToast(`Sincronizando ${queue.length} ventas offline...`, 'success');
+      let successfulSyncs = 0;
+      
+      for (let sale of queue) {
+          try {
+              const res = await fetch('/api/sales', {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify(sale)
+              });
+              if (res.ok) successfulSyncs++;
+          } catch (e) { console.error('Failed to sync offline sale', e); }
+      }
+      
+      if (successfulSyncs > 0) {
+         localStorage.removeItem('offlineSales');
+         showToast(`${successfulSyncs} ventas sincronizadas con el servidor.`);
+         loadReports();
+         loadHistorial('today');
+      }
+  }
+
+  function toggleAdminButtons(disabled) {
+      ['btn-add-product', 'btn-manage-cats', 'void-invoice-btn'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+              el.disabled = disabled;
+              el.style.opacity = disabled ? '0.5' : '1';
+          }
+      });
+  }
+
+  window.addEventListener('online', () => {
+      const banner = document.getElementById('offline-banner');
+      if(banner) banner.style.display = 'none';
+      toggleAdminButtons(false);
+      syncOfflineSales();
+  });
+
+  window.addEventListener('offline', () => {
+      const banner = document.getElementById('offline-banner');
+      if(banner) banner.style.display = 'block';
+      toggleAdminButtons(true);
+  });
+
+  if (!navigator.onLine) {
+      const banner = document.getElementById('offline-banner');
+      if(banner) banner.style.display = 'block';
+      toggleAdminButtons(true);
+  } else {
+      setTimeout(syncOfflineSales, 2000);
+  }
 });

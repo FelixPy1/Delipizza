@@ -834,3 +834,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);displ
     .cat-add-form #new-cat-emoji { width: 100% !important; text-align: left; }
     .cat-manager-body { padding: 0 16px 20px; }
 }
+
+/* ======== OFFLINE BANNER ======== */
+.offline-banner {
+    background-color: #ef4444;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    z-index: 9999;
+    position: relative;
+    width: 100%;
+}
