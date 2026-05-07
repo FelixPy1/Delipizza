@@ -851,4 +851,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   } else {
       setTimeout(syncOfflineSales, 2000);
   }
+
+  // Interceptar Cerrar Sesión para reemplazar el historial
+  const logoutLink = document.querySelector('a[href="/logout"]');
+  if (logoutLink) {
+      logoutLink.addEventListener('click', async (e) => {
+          e.preventDefault();
+          try {
+              await fetch('/logout');
+          } catch (err) {
+              console.error(err);
+          }
+          // Reemplazamos la página actual con el login, borrando el index del historial.
+          window.location.replace('/login');
+      });
+  }
+
+  // Evitar que el BFCache muestre la página si el usuario usa la navegación del SO forzada
+  window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+          window.location.reload();
+      }
+  });
 });
