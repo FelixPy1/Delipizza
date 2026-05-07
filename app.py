@@ -1,7 +1,7 @@
 import os
 import sys
 import functools
-from flask import Flask, request, jsonify, render_template, session, redirect, send_from_directory
+from flask import Flask, request, jsonify, render_template, session, redirect, send_from_directory, make_response
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 import pytz
@@ -123,7 +123,11 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html', role=session.get('role', 'user'))
+    resp = make_response(render_template('index.html', role=session.get('role', 'user')))
+    resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
+    return resp
 
 # CATEGORIAS
 @app.route('/api/categories')
