@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deli-pizza-v1';
+const CACHE_NAME = 'deli-pizza-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/static/css/styles.css',
@@ -42,7 +42,29 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Estrategia: Caché primero, luego red
+  // Si es una petición de navegación (páginas HTML), usamos: Red primero, luego Caché
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Actualizar caché dinámica si es exitoso
+          if (response && response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Si falla la red, intentar buscar en caché
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // Estrategia para archivos estáticos: Caché primero, luego red
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -50,8 +72,8 @@ self.addEventListener('fetch', (event) => {
           return response; // Devolver desde el caché
         }
         return fetch(event.request).then((fetchResponse) => {
-          // Guardar dinámicamente nuevos recursos como las imágenes de los logos si se solicitan
-          if (fetchResponse.status === 200) {
+          // Guardar dinámicamente nuevos recursos
+          if (fetchResponse && fetchResponse.status === 200) {
             const responseClone = fetchResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseClone);
