@@ -19,19 +19,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---- CLOCK ----
   function updateClock() {
     const now = new Date();
-    const h = String(now.getHours()).padStart(2,'0');
-    const m = String(now.getMinutes()).padStart(2,'0');
+    const timeStr = now.toLocaleTimeString('es-DO', {timeZone: 'America/Santo_Domingo', hour: '2-digit', minute: '2-digit', hour12: false});
     const el = document.getElementById('sidebar-clock');
-    if (el) el.textContent = `${h}:${m}`;
+    if (el) el.textContent = timeStr;
     const d = document.getElementById('sidebar-date');
-    if (d) d.textContent = now.toLocaleDateString('es-DO',{weekday:'long',day:'numeric',month:'short'});
+    if (d) d.textContent = now.toLocaleDateString('es-DO',{timeZone: 'America/Santo_Domingo', weekday:'long',day:'numeric',month:'short'});
   }
   updateClock();
   setInterval(updateClock, 30000);
 
   // ---- REPORT DATE ----
   const now = new Date();
-  const fmt = now.toLocaleDateString('es-DO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const fmt = now.toLocaleDateString('es-DO',{timeZone: 'America/Santo_Domingo', weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const rdl = document.getElementById('report-date-label');
   if (rdl) rdl.textContent = fmt.charAt(0).toUpperCase()+fmt.slice(1);
 
@@ -393,9 +392,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function showInvoiceModal(sale) {
     currentSaleId = sale.id;
-    const dateObj = new Date(sale.date);
-    const dateStr = dateObj.toLocaleDateString('es-DO', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-    const timeStr = dateObj.toLocaleTimeString('es-DO', {hour:'2-digit', minute:'2-digit'});
+    const dateObj = new Date(sale.date + '-04:00');
+    const dateStr = dateObj.toLocaleDateString('es-DO', {timeZone: 'America/Santo_Domingo', weekday:'long', day:'numeric', month:'long', year:'numeric'});
+    const timeStr = dateObj.toLocaleTimeString('es-DO', {timeZone: 'America/Santo_Domingo', hour:'2-digit', minute:'2-digit'});
     document.getElementById('inv-number').textContent = sale.invoice_number || `FAC-${String(sale.id).padStart(4,'0')}`;
     document.getElementById('inv-datetime').textContent = `${dateStr.charAt(0).toUpperCase()+dateStr.slice(1)} · ${timeStr}`;
     document.getElementById('inv-product-name').textContent = `${sale.product_emoji || '🍕'} ${sale.product_name}`;
@@ -406,8 +405,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('inv-grand-total').textContent = `$${sale.price_at_sale.toFixed(2)}`;
     
     // Datos Internos
-    document.getElementById('inv-internal-cost').textContent = `$${(sale.cost_at_sale || 0).toFixed(2)}`;
-    document.getElementById('inv-internal-profit').textContent = `$${(sale.profit_at_sale || 0).toFixed(2)}`;
+    const costEl = document.getElementById('inv-internal-cost');
+    if (costEl) costEl.textContent = `$${(sale.cost_at_sale || 0).toFixed(2)}`;
+    
+    const profitEl = document.getElementById('inv-internal-profit');
+    if (profitEl) profitEl.textContent = `$${(sale.profit_at_sale || 0).toFixed(2)}`;
     
     document.getElementById('invoice-modal').classList.add('active');
   }
@@ -538,7 +540,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const stats = await res.json();
 
       // HOY
-      const todayStr = new Date().toLocaleDateString('es-DO',{weekday:'long', day:'numeric', month:'long'});
+      const todayStr = new Date().toLocaleDateString('es-DO',{timeZone: 'America/Santo_Domingo', weekday:'long', day:'numeric', month:'long'});
       const totalEl = document.getElementById('report-total');
       const profitEl = document.getElementById('report-profit');
       const countEl = document.getElementById('report-count');
@@ -573,10 +575,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       tbody.innerHTML = '';
       sales.forEach((s,i) => {
-        const dateObj = new Date(s.date);
+        const dateObj = new Date(s.date + '-04:00');
         const timeLabel = period === 'today'
-          ? dateObj.toLocaleTimeString('es-DO',{hour:'2-digit',minute:'2-digit'})
-          : dateObj.toLocaleDateString('es-DO',{weekday:'short',day:'numeric',month:'short'});
+          ? dateObj.toLocaleTimeString('es-DO',{timeZone: 'America/Santo_Domingo', hour:'2-digit',minute:'2-digit'})
+          : dateObj.toLocaleDateString('es-DO',{timeZone: 'America/Santo_Domingo', weekday:'short',day:'numeric',month:'short'});
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td data-label="#">#${sales.length-i}</td>
@@ -704,11 +706,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       tbody.innerHTML = '';
       sales.forEach(s => {
-        const dateObj = new Date(s.date);
+        const dateObj = new Date(s.date + '-04:00');
         const isPeriodToday = invActivePeriod === 'today';
         const timeLabel = isPeriodToday
-          ? dateObj.toLocaleTimeString('es-DO', {hour:'2-digit', minute:'2-digit'})
-          : dateObj.toLocaleDateString('es-DO', {weekday:'short', day:'numeric', month:'short'});
+          ? dateObj.toLocaleTimeString('es-DO', {timeZone: 'America/Santo_Domingo', hour:'2-digit', minute:'2-digit'})
+          : dateObj.toLocaleDateString('es-DO', {timeZone: 'America/Santo_Domingo', weekday:'short', day:'numeric', month:'short'});
         const unitPrice = s.unit_price || (s.price_at_sale / s.quantity);
         const invNum = s.invoice_number || `FAC-${String(s.id).padStart(4,'0')}`;
         const tr = document.createElement('tr');

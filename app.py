@@ -4,7 +4,11 @@ import functools
 from flask import Flask, request, jsonify, render_template, session, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
+import pytz
 from dotenv import load_dotenv
+
+def get_now():
+    return datetime.now(pytz.timezone("America/Santo_Domingo")).replace(tzinfo=None)
 
 load_dotenv()
 
@@ -54,8 +58,8 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 db = SQLAlchemy(app)
 
 # ── CONFIG ─────────────────────────────────────────
-ADMIN_USER = os.getenv('ADMIN_USER', 'alexander2026MA')
-ADMIN_PASS = os.getenv('ADMIN_PASS', '12345MMAA')
+ADMIN_USER = os.getenv('ADMIN_USER', 'Admin')
+ADMIN_PASS = os.getenv('ADMIN_PASS', 'Dellipizzam&a6508')
 
 def login_required(f):
     @functools.wraps(f)
@@ -82,7 +86,7 @@ class Category(db.Model):
 class Sale(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer)
-    date = db.Column(db.DateTime, default=datetime.now)
+    date = db.Column(db.DateTime, default=get_now)
     price_at_sale = db.Column(db.Float)
     cost_at_sale = db.Column(db.Float, default=0.0)
     quantity = db.Column(db.Integer)
@@ -93,7 +97,14 @@ def login():
     if request.method == 'POST':
         if request.form['username'] == ADMIN_USER and request.form['password'] == ADMIN_PASS:
             session['logged_in'] = True
+            session['role'] = 'admin'
             return redirect('/')
+        elif request.form['username'] == 'Usuario' and request.form['password'] == '6508':
+            session['logged_in'] = True
+            session['role'] = 'user'
+            return redirect('/')
+        else:
+            return render_template('login.html', error='Usuario o contraseña incorrectos')
     return render_template('login.html')
 
 @app.route('/logout')
@@ -104,7 +115,7 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', role=session.get('role', 'user'))
 
 # CATEGORIAS
 @app.route('/api/categories')
@@ -179,7 +190,7 @@ def add_product():
 @app.route('/api/stats')
 def stats():
     sales = Sale.query.all()
-    today = datetime.now().date()
+    today = get_now().date()
     daily_sales = [s for s in sales if s.date.date() == today]
     
     daily_profit = sum(s.price_at_sale - (s.cost_at_sale or 0) for s in daily_sales)
@@ -252,7 +263,7 @@ def sales_history():
     pid = request.args.get('product_id', 'all')
     
     query = Sale.query
-    now = datetime.now()
+    now = get_now()
     
     if period == 'today':
         query = query.filter(db.func.date(Sale.date) == now.date())

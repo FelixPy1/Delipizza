@@ -59,6 +59,7 @@
                 <span class="nav-indicator"></span>
             </button>
 
+            {% if role == 'admin' %}
             <button class="nav-item" data-view="products" id="nav-products">
                 <span class="nav-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -69,6 +70,7 @@
                 <span class="nav-label">Productos</span>
                 <span class="nav-indicator"></span>
             </button>
+            {% endif %}
 
             <button class="nav-item" data-view="notes" id="nav-notes">
                 <span class="nav-icon">
@@ -177,6 +179,7 @@
                 </div>
 
                 <!-- Ganancia de HOY -->
+                {% if role == 'admin' %}
                 <div class="metric-card" style="background: linear-gradient(135deg, #059669, #047857); border:none; box-shadow: 0 10px 30px rgba(5,150,105,0.25);">
                     <div class="mc-header">
                         <span class="mc-label" style="color: #A7F3D0;">Ganancia Limpia</span>
@@ -189,6 +192,7 @@
                     <div class="mc-value" id="report-profit" style="color: #fff;">$0.00</div>
                     <div class="mc-delta" style="color: #A7F3D0;">después de costos</div>
                 </div>
+                {% endif %}
 
                 <!-- Pedidos hoy -->
                 <div class="metric-card mc-orange">
@@ -440,6 +444,7 @@
                 </div>
 
                 <!-- SECCIÓN PERSONAL / INTERNA -->
+                {% if role == 'admin' %}
                 <div class="inv-internal-data" id="inv-internal-data">
                     <div class="internal-divider"></div>
                     <div class="internal-header">📊 DATOS DE CONTROL INTERNO</div>
@@ -452,6 +457,7 @@
                         <span id="inv-internal-profit">$0.00</span>
                     </div>
                 </div>
+                {% endif %}
             </div>
             <div class="inv-actions" id="inv-actions">
                 <button class="btn-ghost" id="close-invoice-modal">Cerrar</button>

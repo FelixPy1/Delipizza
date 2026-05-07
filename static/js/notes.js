@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
       div.className = 'note-item' + (note.paid ? ' paid' : '');
 
       var d = new Date(note.createdAt);
-      var ds = d.toLocaleDateString('es-DO', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+      var ds = d.toLocaleDateString('es-DO', {timeZone: 'America/Santo_Domingo', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
 
       var statusHtml = note.paid
         ? '<div class="note-status">✓ Pagado</div>'
