@@ -1,0 +1,27 @@
+# Virtual environment (specific to local machine)
+venv/
+.venv/
+env/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local environment variables (contains secrets/passwords)
+.env
+
+# Local SQLite databases (development test data)
+*.db
+delipizza.db
+instance/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Spec files and build directories (compiled packages)
+build/
+dist/
+*.spec
