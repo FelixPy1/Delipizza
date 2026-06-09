@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deli-pizza-v3';
+const CACHE_NAME = 'deli-pizza-v4';
 const ASSETS_TO_CACHE = [
   '/',
   '/static/css/styles.css',

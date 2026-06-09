@@ -357,6 +357,7 @@
                 if (res.redirected) {
                     // Si el login fue exitoso y nos redirigió al index, usamos replace
                     // para evitar que el /login quede en el historial. Así el botón atrás sale de la app.
+                    sessionStorage.setItem('tab_session', 'active');
                     window.location.replace(res.url);
                 } else {
                     // Si falló (nos devolvió la página de login con error)

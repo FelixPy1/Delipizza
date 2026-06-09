@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  // Asegurar que cerramos sesión si el usuario cerró completamente la aplicación o pestaña
+  if (!sessionStorage.getItem('tab_session')) {
+      window.location.replace('/logout');
+      return;
+  }
+
   let cart = [];
 
   // ---- MOBILE MENU ----
@@ -1447,4 +1453,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           window.location.reload();
       }
   });
+
+  // Interceptar todos los fetch para detectar si la sesión expiró (401)
+  const originalFetch = window.fetch;
+  window.fetch = async function() {
+      const response = await originalFetch.apply(this, arguments);
+      if (response.status === 401) {
+          window.location.replace('/login');
+      }
+      return response;
+  };
 });
