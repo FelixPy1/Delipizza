@@ -83,6 +83,16 @@ class Category(db.Model):
     name = db.Column(db.String(50), unique=True)
     emoji = db.Column(db.String(10))
 
+class Shift(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    start_time = db.Column(db.DateTime, default=get_now)
+    end_time = db.Column(db.DateTime, nullable=True)
+    initial_cash = db.Column(db.Float, default=0.0)
+    final_cash = db.Column(db.Float, nullable=True)
+    status = db.Column(db.String(20), default='open') # 'open', 'closed'
+    opened_by = db.Column(db.String(50), default='Usuario')
+    closed_by = db.Column(db.String(50), nullable=True)
+
 class Sale(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer)
@@ -90,6 +100,7 @@ class Sale(db.Model):
     price_at_sale = db.Column(db.Float)
     cost_at_sale = db.Column(db.Float, default=0.0)
     quantity = db.Column(db.Integer)
+    shift_id = db.Column(db.Integer, db.ForeignKey('shift.id'), nullable=True)
 
 # ── RUTAS ─────────────────────────────────────────
 @app.route('/sw.js')
@@ -199,21 +210,167 @@ def add_product():
     db.session.commit()
     return jsonify({"ok":True})
 
-@app.route('/api/stats')
-def stats():
-    sales = Sale.query.all()
-    today = get_now().date()
-    daily_sales = [s for s in sales if s.date.date() == today]
+@app.route('/api/shifts/active')
+@login_required
+def get_active_shift():
+    active_shift = Shift.query.filter_by(status='open').first()
+    if active_shift:
+        sales = Sale.query.filter_by(shift_id=active_shift.id).all()
+        total_sales = sum(s.price_at_sale for s in sales)
+        return jsonify({
+            "active": True,
+            "id": active_shift.id,
+            "start_time": active_shift.start_time.isoformat(),
+            "initial_cash": active_shift.initial_cash,
+            "opened_by": active_shift.opened_by,
+            "total_sales": total_sales,
+            "expected_cash": active_shift.initial_cash + total_sales
+        })
+    return jsonify({"active": False})
+
+@app.route('/api/shifts/open', methods=['POST'])
+@login_required
+def open_shift():
+    active_shift = Shift.query.filter_by(status='open').first()
+    if active_shift:
+        return jsonify({"error": "Ya hay un turno activo"}), 400
     
-    daily_profit = sum(s.price_at_sale - (s.cost_at_sale or 0) for s in daily_sales)
-    monthly_profit = sum(s.price_at_sale - (s.cost_at_sale or 0) for s in sales if s.date.month == today.month and s.date.year == today.year)
+    data = request.json or {}
+    initial_cash = float(data.get('initial_cash', 0.0))
     
+    new_shift = Shift(
+        initial_cash=initial_cash,
+        opened_by=session.get('role', 'user'),
+        status='open',
+        start_time=get_now()
+    )
+    db.session.add(new_shift)
+    db.session.commit()
     return jsonify({
-        "daily_revenue": sum(s.price_at_sale for s in daily_sales),
-        "daily_profit": daily_profit,
-        "daily_count": len(daily_sales),
-        "monthly_profit": monthly_profit
+        "ok": True,
+        "shift": {
+            "id": new_shift.id,
+            "initial_cash": new_shift.initial_cash,
+            "start_time": new_shift.start_time.isoformat()
+        }
     })
+
+@app.route('/api/shifts/close', methods=['POST'])
+@login_required
+def close_shift():
+    active_shift = Shift.query.filter_by(status='open').first()
+    if not active_shift:
+        return jsonify({"error": "No hay ningún turno activo para cerrar"}), 400
+    
+    data = request.json or {}
+    final_cash = float(data.get('final_cash', 0.0))
+    
+    active_shift.status = 'closed'
+    active_shift.end_time = get_now()
+    active_shift.final_cash = final_cash
+    active_shift.closed_by = session.get('role', 'user')
+    
+    db.session.commit()
+    session.clear()
+    return jsonify({"ok": True})
+
+@app.route('/api/shifts/history')
+@login_required
+def get_shifts_history():
+    if session.get('role') != 'admin':
+        return jsonify({"error": "No autorizado"}), 403
+    
+    shifts = Shift.query.order_by(Shift.start_time.desc()).all()
+    res = []
+    for s in shifts:
+        sales = Sale.query.filter_by(shift_id=s.id).all()
+        total_sales = sum(s.price_at_sale for s in sales)
+        res.append({
+            "id": s.id,
+            "start_time": s.start_time.isoformat(),
+            "end_time": s.end_time.isoformat() if s.end_time else None,
+            "initial_cash": s.initial_cash,
+            "final_cash": s.final_cash,
+            "status": s.status,
+            "opened_by": s.opened_by,
+            "closed_by": s.closed_by,
+            "total_sales": total_sales,
+            "expected_cash": s.initial_cash + total_sales
+        })
+    return jsonify(res)
+
+@app.route('/api/shifts/<int:shift_id>/sales')
+@login_required
+def get_shift_sales(shift_id):
+    if session.get('role') != 'admin':
+        return jsonify({"error": "No autorizado"}), 403
+        
+    sales = Sale.query.filter(Sale.shift_id == shift_id).order_by(Sale.date.desc()).all()
+    grouped_sales = {}
+    for s in sales:
+        date_str = s.date.isoformat()
+        if date_str not in grouped_sales:
+            grouped_sales[date_str] = {
+                "id": s.id,
+                "invoice_number": f"FAC-{str(s.id).zfill(4)}",
+                "date": date_str,
+                "items": [],
+                "total_price": 0,
+                "total_cost": 0,
+                "total_profit": 0,
+                "total_quantity": 0
+            }
+            
+        p = Product.query.get(s.product_id)
+        grouped_sales[date_str]["items"].append({
+            "product_name": p.name if p else "Producto Eliminado",
+            "product_emoji": p.emoji if p else "❓",
+            "quantity": s.quantity,
+            "price_at_sale": s.price_at_sale,
+            "unit_price": p.price if p else (s.price_at_sale / s.quantity)
+        })
+        grouped_sales[date_str]["total_price"] += s.price_at_sale
+        grouped_sales[date_str]["total_cost"] += (s.cost_at_sale or 0)
+        grouped_sales[date_str]["total_profit"] += (s.price_at_sale - (s.cost_at_sale or 0))
+        grouped_sales[date_str]["total_quantity"] += s.quantity
+        
+    return jsonify(list(grouped_sales.values()))
+
+@app.route('/api/stats')
+@login_required
+def stats():
+    role = session.get('role', 'user')
+    if role == 'user':
+        active_shift = Shift.query.filter_by(status='open').first()
+        if not active_shift:
+            return jsonify({
+                "daily_revenue": 0.0,
+                "daily_profit": 0.0,
+                "daily_count": 0,
+                "monthly_profit": 0.0
+            })
+        shift_sales = Sale.query.filter_by(shift_id=active_shift.id).all()
+        profit = sum(s.price_at_sale - (s.cost_at_sale or 0) for s in shift_sales)
+        return jsonify({
+            "daily_revenue": sum(s.price_at_sale for s in shift_sales),
+            "daily_profit": profit,
+            "daily_count": len(shift_sales),
+            "monthly_profit": profit
+        })
+    else:
+        sales = Sale.query.all()
+        today = get_now().date()
+        daily_sales = [s for s in sales if s.date.date() == today]
+        
+        daily_profit = sum(s.price_at_sale - (s.cost_at_sale or 0) for s in daily_sales)
+        monthly_profit = sum(s.price_at_sale - (s.cost_at_sale or 0) for s in sales if s.date.month == today.month and s.date.year == today.year)
+        
+        return jsonify({
+            "daily_revenue": sum(s.price_at_sale for s in daily_sales),
+            "daily_profit": daily_profit,
+            "daily_count": len(daily_sales),
+            "monthly_profit": monthly_profit
+        })
 
 # --- PRODUCTOS (EXTENDIDO) ---
 @app.route('/api/products/<int:id>', methods=['PUT'])
@@ -238,6 +395,10 @@ def delete_product(id):
 # --- VENTAS (EXTENDIDO) ---
 @app.route('/api/sales', methods=['POST'])
 def add_sale():
+    active_shift = Shift.query.filter_by(status='open').first()
+    if not active_shift:
+        return jsonify({"error": "No hay un turno activo. Debes abrir caja primero."}), 400
+        
     data = request.json
     prod = Product.query.get(data['product_id'])
     if not prod: return jsonify({"error":"Product not found"}), 404
@@ -252,7 +413,8 @@ def add_sale():
         quantity=qty,
         price_at_sale=total_price,
         cost_at_sale=total_cost,
-        date=now
+        date=now,
+        shift_id=active_shift.id
     )
     db.session.add(s)
     db.session.commit()
@@ -276,6 +438,10 @@ def add_sale():
 
 @app.route('/api/sales/batch', methods=['POST'])
 def add_sale_batch():
+    active_shift = Shift.query.filter_by(status='open').first()
+    if not active_shift:
+        return jsonify({"error": "No hay un turno activo. Debes abrir caja primero."}), 400
+        
     items_data = request.json.get('items', [])
     if not items_data:
         return jsonify({"error": "No items"}), 400
@@ -293,7 +459,8 @@ def add_sale_batch():
             quantity=qty,
             price_at_sale=prod.price * qty,
             cost_at_sale=(prod.cost_price or 0) * qty,
-            date=now
+            date=now,
+            shift_id=active_shift.id
         )
         db.session.add(s)
         sales_created.append((s, prod))
@@ -334,20 +501,32 @@ def add_sale_batch():
     })
 
 @app.route('/api/sales/history')
+@login_required
 def sales_history():
     period = request.args.get('period', 'today')
     pid = request.args.get('product_id', 'all')
     
-    query = Sale.query
-    now = get_now()
-    
-    if period == 'today':
-        query = query.filter(db.func.date(Sale.date) == now.date())
-    elif period == 'week':
-        week_ago = now - timedelta(days=7)
-        query = query.filter(Sale.date >= week_ago)
-    elif period == 'month':
-        query = query.filter(db.func.extract('month', Sale.date) == now.month)
+    role = session.get('role', 'user')
+    if role == 'user':
+        active_shift = Shift.query.filter_by(status='open').first()
+        if not active_shift:
+            return jsonify([])
+        query = Sale.query.filter(Sale.shift_id == active_shift.id)
+    else:
+        query = Sale.query
+        now = get_now()
+        
+        if period == 'today':
+            start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_of_day = start_of_day + timedelta(days=1)
+            query = query.filter(Sale.date >= start_of_day, Sale.date < end_of_day)
+        elif period == 'week':
+            week_ago = now - timedelta(days=7)
+            query = query.filter(Sale.date >= week_ago)
+        elif period == 'month':
+            start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            query = query.filter(Sale.date >= start_of_month)
+        # elif period == 'all': no filter — return everything
         
     if pid != 'all':
         # Encontrar las fechas que contienen este producto
@@ -401,6 +580,19 @@ def void_sale(id):
 with app.app_context():
     # Creamos las tablas de forma segura (sin borrar nada)
     db.create_all()
+
+    # Migración automática: agregar shift_id a sale si no existe (SQLite no la tiene con ALTER TABLE en versiones viejas)
+    try:
+        inspector = db.inspect(db.engine)
+        existing_cols = [col['name'] for col in inspector.get_columns('sale')]
+        if 'shift_id' not in existing_cols:
+            print("⚙️  Migrando esquema: añadiendo columna shift_id a la tabla sale...")
+            with db.engine.connect() as conn:
+                conn.execute(db.text("ALTER TABLE sale ADD COLUMN shift_id INTEGER REFERENCES shift(id)"))
+                conn.commit()
+            print("✅ Migración completada.")
+    except Exception as e:
+        print(f"⚠️  Error en migración de shift_id: {e}")
 
     # Semilla de categorías si está vacío
     try:

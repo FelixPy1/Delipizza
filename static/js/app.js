@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (target === 'reports') { loadReports(); loadHistorial('today'); }
       if (target === 'products') loadProductsManagement();
       if (target === 'invoices') loadInvoices('today', 'all');
+      if (target === 'shifts') loadShifts();
       
       // Cerrar sidebar en móvil tras navegar
       sidebar.classList.remove('mobile-active');
@@ -481,7 +482,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast(`✓ Venta registrada`);
             showInvoiceModal(invoiceData);
           } else {
-            showToast('Error al procesar la venta', 'error');
+            const errData = await res.json().catch(() => ({}));
+            showToast(errData.error || 'Error al procesar la venta', 'error');
           }
         } catch { 
             saveSaleOffline(payload);
@@ -817,7 +819,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const res = await fetch(url);
       let sales = await res.json();
 
-      // Aplicar búsqueda local si hay texto
+      // Busqueda local
       const search = document.getElementById('inv-search-input').value.trim().toUpperCase();
       if (search) {
         sales = sales.filter(s => {
@@ -826,70 +828,181 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
 
-      // Update stats bar
+      // Stats bar
       const total = sales.reduce((s, v) => s + v.total_price, 0);
       const countEl = document.getElementById('inv-count-label');
       const totalEl = document.getElementById('inv-total-label');
       if (countEl) countEl.textContent = sales.length;
       if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
 
-      const tbody = document.getElementById('invoices-table-body');
+      const container = document.getElementById('invoices-container');
+      container.innerHTML = '';
+
       if (!sales.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No hay facturas para este período.</td></tr>';
+        container.innerHTML = `
+          <div class="inv-empty-state">
+            <div class="inv-empty-icon">🧾</div>
+            <p class="inv-empty-title">No hay facturas</p>
+            <p class="inv-empty-sub">No se encontraron facturas para este período.</p>
+          </div>`;
         return;
       }
-      tbody.innerHTML = '';
-      sales.forEach(s => {
-        const dateObj = new Date(s.date + '-04:00');
-        const isPeriodToday = invActivePeriod === 'today';
-        const timeLabel = isPeriodToday
-          ? dateObj.toLocaleTimeString('es-DO', {timeZone: 'America/Santo_Domingo', hour:'2-digit', minute:'2-digit'})
-          : dateObj.toLocaleDateString('es-DO', {timeZone: 'America/Santo_Domingo', weekday:'short', day:'numeric', month:'short'});
-        const invNum = s.invoice_number || `FAC-${String(s.id).padStart(4,'0')}`;
-        
-        const prodName = s.items.length > 1 ? `Varios artículos (${s.items.length})` : `${s.items[0].product_emoji||'🍕'} ${s.items[0].product_name}`;
-        const unitPriceStr = s.items.length > 1 ? "-" : `$${s.items[0].unit_price.toFixed(2)}`;
 
-        const totalVal = s.total_price || 0;
-        const qtyVal = s.total_quantity || 0;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td data-label="Factura"><span class="inv-num-badge">${invNum}</span></td>
-          <td data-label="Producto"><div class="sale-product">${prodName}</div></td>
-          <td data-label="Fecha" class="table-time">${timeLabel}</td>
-          <td data-label="Cantidad">${qtyVal}</td>
-          <td data-label="P/U">${unitPriceStr}</td>
-          <td data-label="Total" class="table-amount">$${totalVal.toFixed(2)}</td>
-          <td class="table-actions">
-            <button class="btn-reprint" title="Reimprimir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> <span>Imprimir</span></button>
-            ${window.USER_ROLE === 'admin' ? `<button class="btn-void-sale" title="Anular"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg> <span>Anular</span></button>` : ''}
-          </td>`;
-        tbody.appendChild(tr);
-        tr.querySelector('.btn-reprint').addEventListener('click', () => showInvoiceModal(s));
-        if (window.USER_ROLE === 'admin') {
-          tr.querySelector('.btn-void-sale').addEventListener('click', async () => {
-            if (!confirm(`¿Anular la factura ${invNum}? Esta acción no se puede deshacer.`)) return;
-            try {
-              const res = await fetch(`/api/sales/${s.id}`, { method: 'DELETE' });
-              if (res.ok) {
-                showToast('Venta anulada', 'error');
-                loadInvoices(invActivePeriod, invActiveProduct);
-                loadReports();
-              }
-            } catch { showToast('Error al anular', 'error'); }
+      if (period === 'today') {
+        // ── MODO TARJETAS (día) ──────────────────────
+        const grid = document.createElement('div');
+        grid.className = 'inv-cards-grid';
+
+        sales.forEach(s => {
+          const dateObj = new Date(s.date + '-04:00');
+          const timeLabel = dateObj.toLocaleTimeString('es-DO', {timeZone: 'America/Santo_Domingo', hour:'2-digit', minute:'2-digit'});
+          const invNum = s.invoice_number || `FAC-${String(s.id).padStart(4,'0')}`;
+          const totalVal = s.total_price || 0;
+          const qtyVal = s.total_quantity || 0;
+
+          const itemsHTML = s.items.map(it => `
+            <div class="inv-card-item-row">
+              <span class="inv-card-item-name">${it.product_emoji || '🍕'} ${it.product_name}</span>
+              <span class="inv-card-item-qty">x${it.quantity}</span>
+              <span class="inv-card-item-price">$${it.price_at_sale.toFixed(2)}</span>
+            </div>`).join('');
+
+          const card = document.createElement('div');
+          card.className = 'inv-card';
+          card.innerHTML = `
+            <div class="inv-card-header">
+              <div class="inv-card-num">${invNum}</div>
+              <div class="inv-card-time">🕐 ${timeLabel}</div>
+            </div>
+            <div class="inv-card-items">${itemsHTML}</div>
+            <div class="inv-card-footer">
+              <div class="inv-card-qty-info">
+                <span class="inv-card-qty-badge">${qtyVal} item${qtyVal !== 1 ? 's' : ''}</span>
+              </div>
+              <div class="inv-card-total">$${totalVal.toFixed(2)}</div>
+            </div>
+            <div class="inv-card-actions">
+              <button class="inv-card-btn btn-reprint">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Imprimir
+              </button>
+              ${window.USER_ROLE === 'admin' ? `
+              <button class="inv-card-btn inv-card-btn-danger btn-void-sale">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
+                Anular
+              </button>` : ''}
+            </div>
+          `;
+
+          card.querySelector('.btn-reprint').addEventListener('click', () => showInvoiceModal(s));
+          if (window.USER_ROLE === 'admin') {
+            card.querySelector('.btn-void-sale').addEventListener('click', async () => {
+              if (!confirm(`¿Anular la factura ${invNum}? Esta acción no se puede deshacer.`)) return;
+              try {
+                const r = await fetch(`/api/sales/${s.id}`, { method: 'DELETE' });
+                if (r.ok) { showToast('Venta anulada', 'error'); loadInvoices(invActivePeriod, invActiveProduct); loadReports(); }
+              } catch { showToast('Error al anular', 'error'); }
+            });
+          }
+          grid.appendChild(card);
+        });
+        container.appendChild(grid);
+
+      } else {
+        // ── MODO TABLA CON SEPARADORES ───────────────
+        const groupByMonth = period === 'month' || period === 'all';
+        const groups = {};
+        const groupOrder = [];
+
+        sales.forEach(s => {
+          const dateObj = new Date(s.date + '-04:00');
+          let groupKey, groupLabel;
+          if (groupByMonth) {
+            groupKey = dateObj.toLocaleDateString('es-DO', {timeZone:'America/Santo_Domingo', year:'numeric', month:'numeric'});
+            groupLabel = dateObj.toLocaleDateString('es-DO', {timeZone:'America/Santo_Domingo', year:'numeric', month:'long'});
+          } else {
+            groupKey = dateObj.toLocaleDateString('es-DO', {timeZone:'America/Santo_Domingo', year:'numeric', month:'numeric', day:'numeric'});
+            groupLabel = dateObj.toLocaleDateString('es-DO', {timeZone:'America/Santo_Domingo', weekday:'long', day:'numeric', month:'long'});
+          }
+          groupLabel = groupLabel.charAt(0).toUpperCase() + groupLabel.slice(1);
+          if (!groups[groupKey]) { groups[groupKey] = { label: groupLabel, items: [] }; groupOrder.push(groupKey); }
+          groups[groupKey].items.push(s);
+        });
+
+        groupOrder.forEach(key => {
+          const group = groups[key];
+          const groupTotal = group.items.reduce((acc, s) => acc + s.total_price, 0);
+
+          // Separador
+          const separator = document.createElement('div');
+          separator.className = 'inv-month-separator';
+          separator.innerHTML = `
+            <div class="inv-month-label">
+              <span class="inv-month-icon">📅</span>
+              <span class="inv-month-text">${group.label}</span>
+              <span class="inv-month-badge">${group.items.length} factura${group.items.length !== 1 ? 's' : ''} · $${groupTotal.toFixed(2)}</span>
+            </div>`;
+          container.appendChild(separator);
+
+          // Tabla del grupo
+          const tableWrap = document.createElement('div');
+          tableWrap.className = 'panel table-panel inv-group-table';
+          tableWrap.innerHTML = `
+            <div class="table-wrapper">
+              <table class="sales-table">
+                <thead>
+                  <tr><th>#Factura</th><th>Producto</th><th>Hora</th><th>Cant.</th><th>Total</th><th></th></tr>
+                </thead>
+                <tbody class="inv-group-tbody"></tbody>
+              </table>
+            </div>`;
+          const tbody = tableWrap.querySelector('.inv-group-tbody');
+
+          group.items.forEach(s => {
+            const dateObj = new Date(s.date + '-04:00');
+            const timeLabel = dateObj.toLocaleTimeString('es-DO', {timeZone:'America/Santo_Domingo', hour:'2-digit', minute:'2-digit'});
+            const invNum = s.invoice_number || `FAC-${String(s.id).padStart(4,'0')}`;
+            const prodName = s.items.length > 1 ? `Varios artículos (${s.items.length})` : `${s.items[0].product_emoji||'🍕'} ${s.items[0].product_name}`;
+            const totalVal = s.total_price || 0;
+            const qtyVal = s.total_quantity || 0;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td data-label="Factura"><span class="inv-num-badge">${invNum}</span></td>
+              <td data-label="Producto"><div class="sale-product">${prodName}</div></td>
+              <td data-label="Hora" class="table-time">${timeLabel}</td>
+              <td data-label="Cant.">${qtyVal}</td>
+              <td data-label="Total" class="table-amount">$${totalVal.toFixed(2)}</td>
+              <td class="table-actions">
+                <button class="btn-reprint" title="Reimprimir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> <span>Imprimir</span></button>
+                ${window.USER_ROLE === 'admin' ? `<button class="btn-void-sale" title="Anular"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg> <span>Anular</span></button>` : ''}
+              </td>`;
+            tr.querySelector('.btn-reprint').addEventListener('click', () => showInvoiceModal(s));
+            if (window.USER_ROLE === 'admin') {
+              tr.querySelector('.btn-void-sale').addEventListener('click', async () => {
+                if (!confirm(`¿Anular la factura ${invNum}? Esta acción no se puede deshacer.`)) return;
+                try {
+                  const r = await fetch(`/api/sales/${s.id}`, { method: 'DELETE' });
+                  if (r.ok) { showToast('Venta anulada', 'error'); loadInvoices(invActivePeriod, invActiveProduct); loadReports(); }
+                } catch { showToast('Error al anular', 'error'); }
+              });
+            }
+            tbody.appendChild(tr);
           });
-        }
-        tbody.appendChild(tr);
-      });
+          container.appendChild(tableWrap);
+        });
+      }
+
     } catch(err) { console.error(err); }
   }
+
 
   // Eventos de filtros de facturas
   document.querySelectorAll('#inv-period-tabs .period-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('#inv-period-tabs .period-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      loadInvoices(tab.dataset.period, invActiveProduct);
+      invActivePeriod = tab.dataset.period;
+      loadInvoices(invActivePeriod, invActiveProduct);
     });
   });
 
@@ -907,11 +1020,305 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadInvoices(invActivePeriod, 'all');
   });
 
+  // ---- SYSTEM SHIFT ----
+  async function checkShiftStatus() {
+    try {
+      const res = await fetch('/api/shifts/active');
+      const data = await res.json();
+      
+      const openShiftModal = document.getElementById('open-shift-modal');
+      const closeShiftBtn = document.getElementById('btn-sidebar-close-shift');
+      
+      if (data.active) {
+        if (openShiftModal) openShiftModal.classList.remove('active');
+        if (closeShiftBtn) closeShiftBtn.style.display = 'flex';
+        return true;
+      } else {
+        if (closeShiftBtn) closeShiftBtn.style.display = 'none';
+        if (openShiftModal) openShiftModal.classList.add('active');
+        return false;
+      }
+    } catch (e) {
+      console.error("Error checking shift status:", e);
+      return false;
+    }
+  }
+
+  // Open Shift Form Submission
+  const openShiftForm = document.getElementById('open-shift-form');
+  if (openShiftForm) {
+    openShiftForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const initialCashVal = parseFloat(document.getElementById('open-shift-initial-cash').value) || 0;
+      
+      try {
+        const res = await fetch('/api/shifts/open', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ initial_cash: initialCashVal })
+        });
+        
+        if (res.ok) {
+          showToast('Turno inaugurado con éxito');
+          await checkShiftStatus();
+          loadProducts();
+          loadReports();
+          loadHistorial('today');
+        } else {
+          const err = await res.json();
+          showToast(err.error || 'Error al abrir turno', 'error');
+        }
+      } catch (err) {
+        showToast('Error de conexión', 'error');
+      }
+    });
+  }
+
+  // Close Shift Sidebar Button
+  let activeShiftData = null;
+  const sidebarCloseShiftBtn = document.getElementById('btn-sidebar-close-shift');
+  if (sidebarCloseShiftBtn) {
+    sidebarCloseShiftBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/shifts/active');
+        const data = await res.json();
+        if (data.active) {
+          activeShiftData = data;
+          const startTime = new Date(data.start_time);
+          document.getElementById('close-shift-start-time').textContent = startTime.toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'});
+          document.getElementById('close-shift-initial-cash').textContent = `$${data.initial_cash.toFixed(2)}`;
+          document.getElementById('close-shift-total-sales').textContent = `$${data.total_sales.toFixed(2)}`;
+          
+          const chk = document.getElementById('close-shift-withdraw-initial');
+          chk.checked = false; // Default: No retirar (Dejar en caja)
+
+          const updateDisplay = () => {
+            const withdraw = chk.checked;
+            const val = withdraw ? data.total_sales : data.expected_cash;
+            document.getElementById('close-shift-expected-cash').textContent = `$${val.toFixed(2)}`;
+            const hiddenInput = document.getElementById('close-shift-final-cash');
+            if (hiddenInput) {
+              hiddenInput.value = val.toFixed(2);
+            }
+            document.getElementById('close-shift-desc-help').textContent = withdraw 
+              ? `Retirando el fondo inicial ($${data.initial_cash.toFixed(2)}). Debes dejar en caja solo el valor de las ventas: $${data.total_sales.toFixed(2)}.` 
+              : `Dejando el fondo inicial ($${data.initial_cash.toFixed(2)}) en caja. Debes dejar un total de $${data.expected_cash.toFixed(2)} en la caja.`;
+          };
+
+          // Reemplazar para limpiar event listeners previos
+          const newChk = chk.cloneNode(true);
+          chk.parentNode.replaceChild(newChk, chk);
+          newChk.addEventListener('change', updateDisplay);
+
+          updateDisplay();
+          
+          document.getElementById('close-shift-modal').classList.add('active');
+        }
+      } catch (err) {
+        showToast('Error al obtener datos del turno', 'error');
+      }
+    });
+  }
+
+  // Close Shift Modal Close/Cancel Buttons
+  const closeCloseShiftModalBtn = document.getElementById('close-close-shift-modal');
+  if (closeCloseShiftModalBtn) {
+    closeCloseShiftModalBtn.addEventListener('click', () => {
+      document.getElementById('close-shift-modal').classList.remove('active');
+    });
+  }
+  const cancelCloseShiftBtn = document.getElementById('cancel-close-shift');
+  if (cancelCloseShiftBtn) {
+    cancelCloseShiftBtn.addEventListener('click', () => {
+      document.getElementById('close-shift-modal').classList.remove('active');
+    });
+  }
+
+  // Close Shift Form Submission
+  const closeShiftForm = document.getElementById('close-shift-form');
+  if (closeShiftForm) {
+    closeShiftForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      let finalCashVal = 0;
+      const hiddenInput = document.getElementById('close-shift-final-cash');
+      if (hiddenInput) {
+        finalCashVal = parseFloat(hiddenInput.value) || 0;
+      } else if (activeShiftData) {
+        const withdraw = document.getElementById('close-shift-withdraw-initial').checked;
+        finalCashVal = withdraw ? activeShiftData.total_sales : activeShiftData.expected_cash;
+      }
+      
+      try {
+        const res = await fetch('/api/shifts/close', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ final_cash: finalCashVal })
+        });
+        
+        if (res.ok) {
+          showToast('Turno cerrado. Sesión finalizada.');
+          setTimeout(() => {
+            window.location.replace('/login');
+          }, 1500);
+        } else {
+          const err = await res.json();
+          showToast(err.error || 'Error al cerrar turno', 'error');
+        }
+      } catch (err) {
+        showToast('Error de conexión', 'error');
+      }
+    });
+  }
+
+  // ---- ADMIN SHIFTS HISTORY & DETAILS ----
+  let shiftsHistoryCache = [];
+
+  async function loadShifts() {
+    try {
+      const res = await fetch('/api/shifts/history');
+      if (!res.ok) return;
+      const data = await res.json();
+      shiftsHistoryCache = data;
+
+      const badge = document.getElementById('shifts-count-badge');
+      if (badge) badge.textContent = `${data.length} turnos`;
+
+      const tbody = document.getElementById('shifts-table-body');
+      if (!tbody) return;
+
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-row">No hay cierres de turno registrados.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      data.forEach(s => {
+        const tr = document.createElement('tr');
+        
+        const startTime = new Date(s.start_time).toLocaleString('es-DO', {hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit'});
+        const endTime = s.end_time ? new Date(s.end_time).toLocaleString('es-DO', {hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit'}) : 'Activo';
+
+        tr.innerHTML = `
+          <td><strong>#${s.id}</strong></td>
+          <td>${s.opened_by || 'Vendedor'}</td>
+          <td>$${s.initial_cash.toFixed(2)}</td>
+          <td style="color: var(--green); font-weight: 700;">$${s.total_sales.toFixed(2)}</td>
+          <td style="font-weight: 700;">$${(s.initial_cash + s.total_sales).toFixed(2)}</td>
+          <td>${startTime}</td>
+          <td>${s.status === 'open' ? '<span class="status-badge status-open">Activo</span>' : endTime}</td>
+          <td>
+            <span class="status-badge ${s.status === 'open' ? 'status-open' : 'status-closed'}">
+              ${s.status === 'open' ? 'Abierto' : 'Cerrado'}
+            </span>
+          </td>
+          <td>
+            <button class="btn-primary btn-sm btn-view-boletin" data-id="${s.id}" style="padding: 4px 8px; font-size: 0.8rem;">
+              Boletín
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Add click listeners to "Boletín" buttons
+      document.querySelectorAll('.btn-view-boletin').forEach(btn => {
+        btn.addEventListener('click', () => {
+          showShiftDetails(parseInt(btn.dataset.id));
+        });
+      });
+
+    } catch (e) {
+      console.error("Error loading shifts history:", e);
+    }
+  }
+
+  async function showShiftDetails(shiftId) {
+    const shift = shiftsHistoryCache.find(s => s.id === shiftId);
+    if (!shift) return;
+
+    // Populate metadata
+    document.getElementById('sd-user').textContent = shift.opened_by || 'Vendedor';
+    document.getElementById('sd-initial').textContent = `$${shift.initial_cash.toFixed(2)}`;
+    document.getElementById('sd-sales').textContent = `$${shift.total_sales.toFixed(2)}`;
+    
+    const totalInCash = shift.initial_cash + shift.total_sales;
+    document.getElementById('sd-total-cash').textContent = `$${totalInCash.toFixed(2)}`;
+
+    // Withdrawal guide
+    document.getElementById('sd-withdraw-fund').textContent = `$${shift.initial_cash.toFixed(2)}`;
+    document.getElementById('sd-withdraw-sales').textContent = `$${shift.total_sales.toFixed(2)}`;
+    document.getElementById('sd-withdraw-total').textContent = `$${totalInCash.toFixed(2)}`;
+
+    document.getElementById('sd-time-start').textContent = new Date(shift.start_time).toLocaleString('es-DO');
+    document.getElementById('sd-time-end').textContent = shift.end_time ? new Date(shift.end_time).toLocaleString('es-DO') : 'Turno Activo';
+
+    // Fetch and populate sales
+    const tbody = document.getElementById('sd-sales-tbody');
+    const salesCountEl = document.getElementById('sd-sales-count');
+    
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-row">Cargando ventas del turno...</td></tr>';
+    
+    try {
+      const res = await fetch(`/api/shifts/${shiftId}/sales`);
+      if (res.ok) {
+        const sales = await res.json();
+        salesCountEl.textContent = `${sales.length} facturas`;
+        
+        if (sales.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No hubo ventas en este turno.</td></tr>';
+        } else {
+          tbody.innerHTML = '';
+          sales.forEach(sale => {
+            const tr = document.createElement('tr');
+            
+            // Join product names and quantities
+            const prodSummary = sale.items.map(it => `${it.product_emoji} ${it.product_name} x${it.quantity}`).join('<br>');
+            const saleTime = new Date(sale.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'});
+            
+            tr.innerHTML = `
+              <td><strong>${sale.invoice_number}</strong></td>
+              <td style="font-size: 0.85rem; line-height: 1.3;">${prodSummary}</td>
+              <td>${saleTime}</td>
+              <td>${sale.total_quantity}</td>
+              <td style="font-weight: 700; color: var(--green);">$${sale.total_price.toFixed(2)}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-row" style="color:var(--danger)">Error al cargar ventas.</td></tr>';
+      }
+    } catch (e) {
+      console.error(e);
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-row" style="color:var(--danger)">Error de conexión.</td></tr>';
+    }
+
+    document.getElementById('shift-details-modal').classList.add('active');
+  }
+
+  // Close shift details modal event listeners
+  const closeShiftDetailsModalBtn = document.getElementById('close-shift-details-modal');
+  if (closeShiftDetailsModalBtn) {
+    closeShiftDetailsModalBtn.addEventListener('click', () => {
+      document.getElementById('shift-details-modal').classList.remove('active');
+    });
+  }
+  const shiftDetailsBackdrop = document.getElementById('shift-details-backdrop');
+  if (shiftDetailsBackdrop) {
+    shiftDetailsBackdrop.addEventListener('click', () => {
+      document.getElementById('shift-details-modal').classList.remove('active');
+    });
+  }
+
   // ---- INIT ----
   await loadCategories();
-  loadProducts();
-  loadReports();
-  loadHistorial('today');
+  const shiftActive = await checkShiftStatus();
+  if (shiftActive || window.USER_ROLE === 'admin') {
+    loadProducts();
+    loadReports();
+    loadHistorial('today');
+  }
 
   // ---- OFFLINE SYNC LOGIC ----
   function saveSaleOffline(saleData) {

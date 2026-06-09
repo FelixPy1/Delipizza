@@ -1039,3 +1039,231 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);displ
     background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 0 4px;
 }
 
+
+/* ====================================================
+   INVOICE VIEW — NEW CARD + GROUPED TABLE DESIGN
+   ==================================================== */
+
+/* Contenedor principal */
+.invoices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-bottom: 24px;
+}
+
+/* ── TARJETAS (vista DÍA) ─────────────────────────── */
+.inv-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    padding: 4px 0;
+}
+
+.inv-card {
+    background: var(--card, var(--surface));
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: cardFadeIn 0.3s ease both;
+}
+@keyframes cardFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.inv-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.28);
+}
+
+.inv-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px 10px;
+    background: linear-gradient(135deg, rgba(234,179,8,0.15), rgba(234,179,8,0.05));
+    border-bottom: 1px solid var(--border);
+}
+.inv-card-num {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--orange, #EAB308);
+    letter-spacing: 0.5px;
+}
+.inv-card-time {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.inv-card-items {
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 50px;
+}
+.inv-card-item-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+.inv-card-item-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.inv-card-item-qty {
+    font-weight: 700;
+    color: var(--orange, #EAB308);
+    min-width: 28px;
+    text-align: right;
+    font-size: 0.85rem;
+}
+.inv-card-item-price {
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    min-width: 60px;
+    text-align: right;
+}
+
+.inv-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 18px;
+    background: var(--surface2, rgba(255,255,255,0.03));
+    border-top: 1px solid var(--border);
+}
+.inv-card-qty-badge {
+    background: var(--surface2, rgba(255,255,255,0.08));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+.inv-card-total {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: var(--green, #10B981);
+}
+
+.inv-card-actions {
+    display: flex;
+    gap: 8px;
+    padding: 10px 18px 14px;
+    border-top: 1px dashed var(--border);
+}
+.inv-card-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.inv-card-btn:hover {
+    border-color: var(--orange, #EAB308);
+    color: var(--orange, #EAB308);
+    background: rgba(234,179,8,0.08);
+}
+.inv-card-btn-danger {
+    border-color: rgba(239,68,68,0.3);
+    color: rgba(239,68,68,0.7);
+}
+.inv-card-btn-danger:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239,68,68,0.1);
+}
+
+/* ── SEPARADORES DE MES/DÍA ──────────────────────── */
+.inv-month-separator {
+    margin-top: 28px;
+    margin-bottom: 10px;
+}
+.inv-month-separator:first-child {
+    margin-top: 8px;
+}
+.inv-month-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.inv-month-icon {
+    font-size: 1.1rem;
+}
+.inv-month-text {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text);
+    text-transform: capitalize;
+}
+.inv-month-badge {
+    background: linear-gradient(135deg, rgba(234,179,8,0.2), rgba(234,179,8,0.08));
+    border: 1px solid rgba(234,179,8,0.3);
+    color: var(--orange, #EAB308);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: auto;
+}
+
+/* Tabla del grupo */
+.inv-group-table {
+    margin-bottom: 4px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Estado vacío */
+.inv-empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text-muted);
+}
+.inv-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+.inv-empty-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+.inv-empty-sub {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+/* Responsive: 1 columna en móvil */
+@media (max-width: 640px) {
+    .inv-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    .inv-card-total {
+        font-size: 1.15rem;
+    }
+}
