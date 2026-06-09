@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deli-pizza-v2';
+const CACHE_NAME = 'deli-pizza-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/static/css/styles.css',
@@ -38,7 +38,10 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // Las peticiones a la API no se cachean con esta estrategia
   // (La lógica offline de ventas se manejará directamente en app.js)
-  if (event.request.url.includes('/api/') || event.request.method !== 'GET') {
+  if (event.request.url.includes('/api/') || 
+      event.request.url.includes('/logout') || 
+      event.request.url.includes('/login') ||
+      event.request.method !== 'GET') {
     return;
   }
 
