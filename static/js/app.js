@@ -909,11 +909,69 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.appendChild(grid);
 
       } else {
-        // ── MODO TABLA CON SEPARADORES ───────────────
+        // ── MODO TARJETAS CON SEPARADORES ───────────────
         const groupByMonth = period === 'month' || period === 'all';
         const groups = {};
         const groupOrder = [];
 
+        // Helper para crear tarjeta de factura
+        function buildInvCard(s, showDate) {
+          const dateObj = new Date(s.date + '-04:00');
+          const timeLabel = showDate
+            ? dateObj.toLocaleDateString('es-DO', {timeZone:'America/Santo_Domingo', weekday:'short', day:'numeric', month:'short'}) + ' · ' +
+              dateObj.toLocaleTimeString('es-DO', {timeZone:'America/Santo_Domingo', hour:'2-digit', minute:'2-digit'})
+            : dateObj.toLocaleTimeString('es-DO', {timeZone:'America/Santo_Domingo', hour:'2-digit', minute:'2-digit'});
+          const invNum = s.invoice_number || `FAC-${String(s.id).padStart(4,'0')}`;
+          const totalVal = s.total_price || 0;
+          const qtyVal = s.total_quantity || 0;
+
+          const itemsHTML = s.items.map(it => `
+            <div class="inv-card-item-row">
+              <span class="inv-card-item-name">${it.product_emoji || '🍕'} ${it.product_name}</span>
+              <span class="inv-card-item-qty">x${it.quantity}</span>
+              <span class="inv-card-item-price">$${it.price_at_sale.toFixed(2)}</span>
+            </div>`).join('');
+
+          const card = document.createElement('div');
+          card.className = 'inv-card';
+          card.innerHTML = `
+            <div class="inv-card-header">
+              <div class="inv-card-num">${invNum}</div>
+              <div class="inv-card-time">🕐 ${timeLabel}</div>
+            </div>
+            <div class="inv-card-items">${itemsHTML}</div>
+            <div class="inv-card-footer">
+              <div class="inv-card-qty-info">
+                <span class="inv-card-qty-badge">${qtyVal} item${qtyVal !== 1 ? 's' : ''}</span>
+              </div>
+              <div class="inv-card-total">$${totalVal.toFixed(2)}</div>
+            </div>
+            <div class="inv-card-actions">
+              <button class="inv-card-btn btn-reprint">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Imprimir
+              </button>
+              ${window.USER_ROLE === 'admin' ? `
+              <button class="inv-card-btn inv-card-btn-danger btn-void-sale">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
+                Anular
+              </button>` : ''}
+            </div>
+          `;
+          card.querySelector('.btn-reprint').addEventListener('click', () => showInvoiceModal(s));
+          if (window.USER_ROLE === 'admin') {
+            card.querySelector('.btn-void-sale').addEventListener('click', async () => {
+              if (!confirm(`¿Anular la factura ${invNum}? Esta acción no se puede deshacer.`)) return;
+              try {
+                const r = await fetch(`/api/sales/${s.id}`, { method: 'DELETE' });
+                if (r.ok) { showToast('Venta anulada', 'error'); loadInvoices(invActivePeriod, invActiveProduct); loadReports(); }
+              } catch { showToast('Error al anular', 'error'); }
+            });
+          }
+          return card;
+        }
+
+        // Agrupar ventas
         sales.forEach(s => {
           const dateObj = new Date(s.date + '-04:00');
           let groupKey, groupLabel;
@@ -929,66 +987,50 @@ document.addEventListener('DOMContentLoaded', async () => {
           groups[groupKey].items.push(s);
         });
 
+        // Para mes/todo: asegurarse de que el mes actual siempre aparezca primero
+        if (groupByMonth) {
+          const nowLocal = new Date();
+          const currentMonthKey = nowLocal.toLocaleDateString('es-DO', {timeZone:'America/Santo_Domingo', year:'numeric', month:'numeric'});
+          const currentMonthLabel = nowLocal.toLocaleDateString('es-DO', {timeZone:'America/Santo_Domingo', year:'numeric', month:'long'});
+          if (!groups[currentMonthKey]) {
+            groups[currentMonthKey] = { label: currentMonthLabel.charAt(0).toUpperCase() + currentMonthLabel.slice(1), items: [] };
+            groupOrder.unshift(currentMonthKey);
+          } else if (groupOrder[0] !== currentMonthKey) {
+            // Mover al inicio si ya existe pero no está primero
+            const idx = groupOrder.indexOf(currentMonthKey);
+            if (idx > 0) { groupOrder.splice(idx, 1); groupOrder.unshift(currentMonthKey); }
+          }
+        }
+
         groupOrder.forEach(key => {
           const group = groups[key];
           const groupTotal = group.items.reduce((acc, s) => acc + s.total_price, 0);
 
-          // Separador
+          // Separador de grupo
           const separator = document.createElement('div');
           separator.className = 'inv-month-separator';
+          const isCurrentMonth = groupByMonth && key === new Date().toLocaleDateString('es-DO', {timeZone:'America/Santo_Domingo', year:'numeric', month:'numeric'});
           separator.innerHTML = `
             <div class="inv-month-label">
-              <span class="inv-month-icon">📅</span>
-              <span class="inv-month-text">${group.label}</span>
+              <span class="inv-month-icon">${groupByMonth ? '📅' : '📆'}</span>
+              <span class="inv-month-text">${group.label}${isCurrentMonth ? ' <span class="inv-current-badge">Este mes</span>' : ''}</span>
               <span class="inv-month-badge">${group.items.length} factura${group.items.length !== 1 ? 's' : ''} · $${groupTotal.toFixed(2)}</span>
             </div>`;
           container.appendChild(separator);
 
-          // Tabla del grupo
-          const tableWrap = document.createElement('div');
-          tableWrap.className = 'panel table-panel inv-group-table';
-          tableWrap.innerHTML = `
-            <div class="table-wrapper">
-              <table class="sales-table">
-                <thead>
-                  <tr><th>#Factura</th><th>Producto</th><th>Hora</th><th>Cant.</th><th>Total</th><th></th></tr>
-                </thead>
-                <tbody class="inv-group-tbody"></tbody>
-              </table>
-            </div>`;
-          const tbody = tableWrap.querySelector('.inv-group-tbody');
-
-          group.items.forEach(s => {
-            const dateObj = new Date(s.date + '-04:00');
-            const timeLabel = dateObj.toLocaleTimeString('es-DO', {timeZone:'America/Santo_Domingo', hour:'2-digit', minute:'2-digit'});
-            const invNum = s.invoice_number || `FAC-${String(s.id).padStart(4,'0')}`;
-            const prodName = s.items.length > 1 ? `Varios artículos (${s.items.length})` : `${s.items[0].product_emoji||'🍕'} ${s.items[0].product_name}`;
-            const totalVal = s.total_price || 0;
-            const qtyVal = s.total_quantity || 0;
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td data-label="Factura"><span class="inv-num-badge">${invNum}</span></td>
-              <td data-label="Producto"><div class="sale-product">${prodName}</div></td>
-              <td data-label="Hora" class="table-time">${timeLabel}</td>
-              <td data-label="Cant.">${qtyVal}</td>
-              <td data-label="Total" class="table-amount">$${totalVal.toFixed(2)}</td>
-              <td class="table-actions">
-                <button class="btn-reprint" title="Reimprimir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> <span>Imprimir</span></button>
-                ${window.USER_ROLE === 'admin' ? `<button class="btn-void-sale" title="Anular"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg> <span>Anular</span></button>` : ''}
-              </td>`;
-            tr.querySelector('.btn-reprint').addEventListener('click', () => showInvoiceModal(s));
-            if (window.USER_ROLE === 'admin') {
-              tr.querySelector('.btn-void-sale').addEventListener('click', async () => {
-                if (!confirm(`¿Anular la factura ${invNum}? Esta acción no se puede deshacer.`)) return;
-                try {
-                  const r = await fetch(`/api/sales/${s.id}`, { method: 'DELETE' });
-                  if (r.ok) { showToast('Venta anulada', 'error'); loadInvoices(invActivePeriod, invActiveProduct); loadReports(); }
-                } catch { showToast('Error al anular', 'error'); }
-              });
-            }
-            tbody.appendChild(tr);
-          });
-          container.appendChild(tableWrap);
+          if (group.items.length === 0) {
+            // Grupo vacío (mes actual sin ventas aún)
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'inv-group-empty';
+            emptyMsg.innerHTML = `<span>📭</span> No hay facturas aún este mes`;
+            container.appendChild(emptyMsg);
+          } else {
+            // Grid de tarjetas
+            const grid = document.createElement('div');
+            grid.className = 'inv-cards-grid';
+            group.items.forEach(s => grid.appendChild(buildInvCard(s, groupByMonth)));
+            container.appendChild(grid);
+          }
         });
       }
 
